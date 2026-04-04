@@ -35,17 +35,14 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/lizhelan929822-eng/Xia
    git clone https://github.com/lizhelan929822-eng/XiaoLuo-Code.git
    cd XiaoLuo-Code
    ```
-
 2. **安装依赖**
    ```bash
    npm install
    ```
-
 3. **构建项目**
    ```bash
    npm run build
    ```
-
 4. **全局安装**
    ```bash
    npm link
@@ -70,15 +67,11 @@ xiaoluo config
 # 然后按照提示输入 API Key
 ```
 
-### 2. 聊天模式
+### 2. 启动！
 
 ```bash
-# 启动聊天模式
-xiaoluo chat
-
-# 示例：与 AI 助手聊天
-xiaoluo chat
-> 如何实现一个快速排序算法？
+# 启动
+xiaoluo
 ```
 
 ### 3. 代码补全
@@ -179,15 +172,12 @@ npm run pkg
 1. **依赖安装失败**
    - 清除 npm 缓存：`npm cache clean --force`
    - 重新安装依赖：`npm install`
-
 2. **构建失败**
    - 确保 Node.js 版本 ≥ 18.0
    - 检查 TypeScript 配置
-
 3. **全局安装失败**
    - Windows：以管理员身份运行 PowerShell
    - macOS/Linux：使用 sudo 权限
-
 4. **API Key 配置问题**
    - 确保 API Key 正确且有效
    - 检查网络连接是否正常
