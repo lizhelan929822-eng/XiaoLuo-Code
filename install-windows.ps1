@@ -22,6 +22,22 @@ if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
     exit 1
 }
 
+# 检查git是否安装
+if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+    Write-Host "错误: git 未安装，请先安装 git" -ForegroundColor Red
+    exit 1
+}
+
+# 检查Node.js版本
+$nodeVersion = node -v
+$versionNumber = $nodeVersion -replace 'v', ''
+$majorVersion = [int]($versionNumber -split '\.')[0]
+if ($majorVersion -lt 18) {
+    Write-Host "错误: Node.js 版本过低，请安装 18.0 或更高版本" -ForegroundColor Red
+    Write-Host "当前版本: $nodeVersion" -ForegroundColor Yellow
+    exit 1
+}
+
 # 克隆仓库
 Write-Host ""
 Write-Host "2. 克隆项目仓库..." -ForegroundColor Cyan

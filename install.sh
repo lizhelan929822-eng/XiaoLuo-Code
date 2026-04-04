@@ -16,6 +16,15 @@ fi
 node_version=$(node -v)
 echo "Node.js 版本: $node_version"
 
+# 检查Node.js版本
+version_number=$(echo $node_version | sed 's/v//')
+major_version=$(echo $version_number | cut -d. -f1)
+if [ $major_version -lt 18 ]; then
+    echo "错误: Node.js 版本过低，请安装 18.0 或更高版本"
+    echo "当前版本: $node_version"
+    exit 1
+fi
+
 # 检查npm是否安装
 if ! command -v npm &> /dev/null; then
     echo "错误: npm 未安装"
