@@ -16,6 +16,18 @@ XiaoLuo Code 是一个功能强大的命令行 AI 编程助手，帮助开发者
 
 ### 1. NPM 安装（推荐）
 
+#### 从 GitHub 仓库安装
+
+```bash
+# 全局安装
+npm install -g git+https://github.com/lizhelan929822-eng/XiaoLuo-Code.git
+
+# 验证安装
+xiaoluo --version
+```
+
+#### 从 npm registry 安装（待发布）
+
 ```bash
 # 全局安装
 npm install -g xiaoluo-code
