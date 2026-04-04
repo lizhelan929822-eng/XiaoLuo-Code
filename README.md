@@ -14,7 +14,17 @@ XiaoLuo Code 是一个功能强大的命令行 AI 编程助手，帮助开发者
 
 ## 部署方式
 
-### 一键部署命令
+### 1. NPM 安装（推荐）
+
+```bash
+# 全局安装
+npm install -g xiaoluo-code
+
+# 验证安装
+xiaoluo --version
+```
+
+### 2. 一键部署命令
 
 #### macOS / Linux
 
@@ -28,21 +38,24 @@ bash <(curl -s https://raw.githubusercontent.com/lizhelan929822-eng/XiaoLuo-Code
 Invoke-WebRequest -Uri "https://raw.githubusercontent.com/lizhelan929822-eng/XiaoLuo-Code/main/install-windows.ps1" -OutFile "install-windows.ps1"; .\install-windows.ps1
 ```
 
-### 手动安装
+### 3. 手动安装
 
 1. **克隆仓库**
    ```bash
    git clone https://github.com/lizhelan929822-eng/XiaoLuo-Code.git
    cd XiaoLuo-Code
    ```
+
 2. **安装依赖**
    ```bash
    npm install
    ```
+
 3. **构建项目**
    ```bash
    npm run build
    ```
+
 4. **全局安装**
    ```bash
    npm link
