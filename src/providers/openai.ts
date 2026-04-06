@@ -12,6 +12,10 @@ const PROVIDER_INFO: ProviderInfo = {
   id: 'openai',
   name: 'OpenAI',
   models: [
+    // GPT-5 系列
+    'gpt-5.2',
+    'gpt-5.4',
+    'gpt-5.4-thinking',
     // GPT-4o 系列
     'gpt-4o',
     'gpt-4o-2024-05-13',
@@ -19,6 +23,7 @@ const PROVIDER_INFO: ProviderInfo = {
     'gpt-4o-2024-11-20',
     'gpt-4o-mini',
     'gpt-4o-mini-2024-07-18',
+    'gpt-4o-audio',
     // GPT-4 Turbo 系列
     'gpt-4-turbo',
     'gpt-4-turbo-2024-04-09',

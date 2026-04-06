@@ -10,6 +10,14 @@ const PROVIDER_INFO: ProviderInfo = {
   id: 'anthropic',
   name: 'Anthropic',
   models: [
+    // Claude 4 系列
+    'claude-4-opus-latest',
+    'claude-4-sonnet-latest',
+    'claude-4-haiku-latest',
+    // Claude 4.5 系列
+    'claude-4.5-sonnet-latest',
+    'claude-4.5-haiku-latest',
+    'claude-4.6-opus-latest',
     // Claude 3.5 系列
     'claude-3-5-sonnet-latest',
     'claude-3-5-sonnet-20241022',

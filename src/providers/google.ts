@@ -14,6 +14,12 @@ const PROVIDER_INFO: ProviderInfo = {
   id: 'google',
   name: 'Google AI',
   models: [
+    // Gemini 3.0 系列
+    'gemini-3.0-pro',
+    'gemini-3.0-ultra',
+    // Gemini 3.1 系列
+    'gemini-3.1-pro',
+    'gemini-3.1-ultra',
     // Gemini 2.0 系列
     'gemini-2.0-flash',
     'gemini-2.0-flash-exp',
@@ -36,6 +42,10 @@ const PROVIDER_INFO: ProviderInfo = {
     'gemini-1.0-flash-lite',
     // Gemini Pro Vision (多模态)
     'gemini-pro-vision',
+    // Gemma 系列
+    'gemma-2b',
+    'gemma-7b',
+    'gemma-3-12b',
   ],
   requiresBaseUrl: false,
   defaultModel: 'gemini-2.0-flash',
