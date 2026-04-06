@@ -352,18 +352,54 @@ export async function startRepl(projectPath: string | null): Promise<void> {
     const trimmedInput = input.trim();
     if (!trimmedInput) continue;
 
+    // 处理Windows拖放时的引号
+    let processedInput = trimmedInput;
+    if (processedInput.startsWith('"') && processedInput.endsWith('"')) {
+      processedInput = processedInput.substring(1, processedInput.length - 1);
+    }
+    if (processedInput.startsWith("'") && processedInput.endsWith("'")) {
+      processedInput = processedInput.substring(1, processedInput.length - 1);
+    }
+
     // 检查是否是切换项目文件夹
-    if (fs.existsSync(trimmedInput) && fs.statSync(trimmedInput).isDirectory()) {
-      projectPath = trimmedInput;
-      printLine(DIM + '\nSwitching project to: ' + WHITE + trimmedInput + RESET);
+    if (fs.existsSync(processedInput) && fs.statSync(processedInput).isDirectory()) {
+      projectPath = processedInput;
+      printLine(DIM + '\nSwitching project to: ' + WHITE + processedInput + RESET);
       // 检查是否为空文件夹
-      const { files, dirs } = countFiles(trimmedInput);
+      const { files, dirs } = countFiles(processedInput);
       if (files > 0 || dirs > 0) {
-        analyzeAndPrintProject(trimmedInput);
+        analyzeAndPrintProject(processedInput);
       } else {
         printLine(DIM + '(Empty folder)' + RESET);
       }
       continue;
+    }
+    
+    // 检查是否是文件拖放
+    if (fs.existsSync(processedInput) && fs.statSync(processedInput).isFile()) {
+      if (!projectPath) {
+        // 如果没有项目文件夹，将文件所在目录作为项目文件夹
+        projectPath = path.dirname(processedInput);
+        printLine(DIM + '\nSwitching project to: ' + WHITE + projectPath + RESET);
+        analyzeAndPrintProject(projectPath);
+      }
+    }
+    
+    // 构建完整的项目上下文
+    let fullPrompt = input;
+    if (projectPath) {
+      fullPrompt = buildProjectContext(input, projectPath);
+    }
+    
+    // 如果是文件拖放，添加文件内容到上下文
+    if (fs.existsSync(processedInput) && fs.statSync(processedInput).isFile()) {
+      const fileContent = readFileContent(processedInput);
+      if (fileContent) {
+        const fileName = path.basename(processedInput);
+        printLine(DIM + '\n[File Dropped] ' + WHITE + fileName + RESET);
+        // 将文件内容添加到用户输入
+        fullPrompt += '\n\n[File Content]\n' + fileContent;
+      }
     }
 
     // 必须先选择项目文件夹才能对话
@@ -372,12 +408,6 @@ export async function startRepl(projectPath: string | null): Promise<void> {
       printLine(DIM + '  将文件夹拖入终端即可添加项目' + RESET);
       printLine(DIM + '  或输入项目文件夹路径后按回车' + RESET + '\n');
       continue;
-    }
-
-    // 构建完整的项目上下文
-    let fullPrompt = input;
-    if (projectPath) {
-      fullPrompt = buildProjectContext(input, projectPath);
     }
 
     messages.push({ role: 'user', content: fullPrompt });
