@@ -49,10 +49,34 @@ foreach ($f in $files) {
 
 npm link --force
 
+# 验证安装并刷新环境
+Write-Host "Verifying installation..." -ForegroundColor Cyan
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+# 尝试刷新文件关联
+Write-Host "Refreshing file associations..." -ForegroundColor Cyan
+try {
+    $npmPath = "C:\Users\$env:USERNAME\AppData\Roaming\npm"
+    $xiaoluoCmd = "$npmPath\xiaoluo.cmd"
+    
+    if (Test-Path $xiaoluoCmd) {
+        Write-Host "xiaoluo.cmd found at: $xiaoluoCmd" -ForegroundColor Green
+    } else {
+        Write-Host "Warning: xiaoluo.cmd not found" -ForegroundColor Yellow
+    }
+} catch {
+    Write-Host "Warning: Could not verify file associations" -ForegroundColor Yellow
+}
+
 # Complete
 Write-Host "" -ForegroundColor Green
 Write-Host "=== Installation Complete ===" -ForegroundColor Green
 Write-Host "Use 'xiaoluo config' to set API Key" -ForegroundColor White
 Write-Host "Use 'xiaoluo' to start REPL mode" -ForegroundColor White
 Write-Host "Use 'xiaoluo chat' to start chat mode" -ForegroundColor White
+Write-Host "" -ForegroundColor Yellow
+Write-Host "If 'xiaoluo' doesn't work, try:" -ForegroundColor Yellow
+Write-Host "1. Close and reopen PowerShell" -ForegroundColor White
+Write-Host "2. Or use: node $npmPath\node_modules\xiaoluo-code\dist\index.js" -ForegroundColor White
+Write-Host "3. Or navigate to XiaoLuo-Code directory and run: npm start" -ForegroundColor White
 Write-Host "" -ForegroundColor Green
