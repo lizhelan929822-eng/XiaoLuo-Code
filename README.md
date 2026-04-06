@@ -1,220 +1,236 @@
 # XiaoLuo Code
 
-## 项目介绍
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-XiaoLuo Code 是一个功能强大的命令行 AI 编程助手，帮助开发者快速编写、理解和优化代码。
+XiaoLuo Code 是一个功能强大的命令行AI编程工具，为开发者提供智能代码辅助和聊天功能。
 
-### 主要功能
+## ✨ 主要功能
 
-- **聊天模式**：与 AI 助手进行自然语言对话，获取编程帮助
-- **代码补全**：智能补全代码片段，提高编码效率
-- **交互式 REPL**：在命令行中与 AI 进行实时交互
-- **多模型支持**：支持多种 AI 模型，包括 OpenAI、Anthropic、Google 等
-- **配置管理**：方便的配置管理系统，支持多种 API Key 配置
+- 🤖 **聊天模式**：与AI助手进行自然语言对话，获取编程帮助
+- ✏️ **代码补全**：智能补全代码片段，提高编码效率
+- 🔄 **交互式REPL**：实时与AI助手交互，快速解决编程问题
+- 🔧 **配置管理**：轻松管理API密钥和其他设置
 
-## 部署方式
-
-### 1. NPM 安装（推荐）
-
-#### 从 GitHub 仓库安装
-
-```bash
-# 全局安装
-npm install -g git+https://github.com/lizhelan929822-eng/XiaoLuo-Code.git
-
-# 验证安装
-xiaoluo --version
-```
-
-#### 从 npm registry 安装（待发布）
-
-```bash
-# 全局安装
-npm install -g xiaoluo-code
-
-# 验证安装
-xiaoluo --version
-```
-
-### 2. 一键部署命令
-
-#### macOS / Linux
-
-```bash
-bash <(curl -s https://raw.githubusercontent.com/lizhelan929822-eng/XiaoLuo-Code/main/install.sh)
-```
-
-#### Windows (PowerShell)
-
-```powershell
-Invoke-WebRequest -Uri "https://raw.githubusercontent.com/lizhelan929822-eng/XiaoLuo-Code/main/install-windows.ps1" -OutFile "install-windows.ps1"; .\install-windows.ps1
-```
-
-### 3. 手动安装
-
-1. **克隆仓库**
-   ```bash
-   git clone https://github.com/lizhelan929822-eng/XiaoLuo-Code.git
-   cd XiaoLuo-Code
-   ```
-
-2. **安装依赖**
-   ```bash
-   npm install
-   ```
-
-3. **构建项目**
-   ```bash
-   npm run build
-   ```
-
-4. **全局安装**
-   ```bash
-   npm link
-   ```
-
-## 系统要求
+## 📋 系统要求
 
 - Node.js 18.0 或更高版本
 - npm 或 yarn 包管理器
-- git（用于克隆仓库）
+- Git（用于克隆仓库）
 
-## 所有命令
+## 🚀 安装方法
 
-### 1. 配置命令
+### Windows
 
-```bash
-# 配置 API Key
-xiaoluo config
+#### 方法1：使用一键安装脚本（推荐）
 
-# 示例：配置 OpenAI API Key
-xiaoluo config
-# 然后按照提示输入 API Key
+```powershell
+# 下载并运行优化版安装脚本
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/lizhelan929822-eng/XiaoLuo-Code/main/install-windows-optimized.ps1" -OutFile "install-windows.ps1"
+
+# 运行安装脚本
+./install-windows.ps1
+
+# 可选参数：
+# --help              显示帮助信息
+# --version <版本>    指定安装版本
+# --no-global         跳过全局安装
+# --directory <路径>  指定安装目录
+# --verbose           显示详细日志
 ```
 
-### 2. 启动！
+#### 方法2：手动安装
+
+```powershell
+# 克隆仓库
+git clone https://github.com/lizhelan929822-eng/XiaoLuo-Code.git
+cd XiaoLuo-Code
+
+# 安装依赖
+npm install
+
+# 构建项目
+npm run build
+
+# 全局安装（可选）
+npm link
+```
+
+### macOS / Linux
+
+#### 方法1：使用安装脚本
 
 ```bash
-# 启动
-xiaoluo
+# 下载并运行安装脚本
+curl -O https://raw.githubusercontent.com/lizhelan929822-eng/XiaoLuo-Code/main/install.sh
+chmod +x install.sh
+./install.sh
+```
+
+#### 方法2：手动安装
+
+```bash
+# 克隆仓库
+git clone https://github.com/lizhelan929822-eng/XiaoLuo-Code.git
+cd XiaoLuo-Code
+
+# 安装依赖
+npm install
+
+# 构建项目
+npm run build
+
+# 全局安装（可选）
+npm link
+```
+
+## 🎯 使用方法
+
+### 1. 配置 API Key
+
+首次使用前，需要配置API密钥：
+
+```bash
+# 使用全局命令
+xiaoluo config
+
+# 或使用本地命令
+npm start config
+```
+
+### 2. 启动聊天模式
+
+```bash
+# 使用全局命令
+xiaoluo chat
+
+# 或使用本地命令
+npm start chat
 ```
 
 ### 3. 代码补全
 
 ```bash
-# 启动代码补全模式
+# 使用全局命令
 xiaoluo complete
 
-# 示例：补全代码
-xiaoluo complete
-> 编写一个函数，计算斐波那契数列的第 n 项
+# 或使用本地命令
+npm start complete
 ```
 
-### 4. 交互式 REPL 模式
+### 4. 启动交互式REPL模式
 
 ```bash
-# 启动 REPL 模式
+# 使用全局命令
 xiaoluo repl
 
-# 示例：在 REPL 中与 AI 交互
-xiaoluo repl
-> 什么是闭包？
-> 如何优化 React 组件性能？
+# 或使用本地命令
+npm start repl
 ```
 
 ### 5. 停止服务
 
 ```bash
-# 停止正在运行的服务
+# 使用全局命令
 xiaoluo stop
+
+# 或使用本地命令
+npm start stop
 ```
 
-### 6. 帮助命令
+## 🔧 开发模式
+
+对于开发者，可以使用开发模式运行：
 
 ```bash
-# 查看帮助信息
-xiaoluo --help
-
-# 查看版本信息
-xiaoluo --version
+npm run dev
 ```
 
-## 配置说明
+这将使用 ts-node 直接运行 TypeScript 文件，无需先构建。
 
-首次运行前需要配置 API Key：
+## 📦 打包为可执行文件
 
-1. 运行 `xiaoluo config` 命令
-2. 按照提示选择 AI 模型提供商
-3. 输入对应的 API Key
-4. 配置完成后即可开始使用
+可以将项目打包为独立的可执行文件：
 
-## 项目结构
+```bash
+npm run pkg
+```
+
+生成的可执行文件将位于项目根目录。
+
+## 🛠️ 项目结构
 
 ```
 XiaoLuo-Code/
 ├── src/
-│   ├── commands/      # 命令实现
-│   ├── config/        # 配置管理
-│   ├── gateway/       # 网关服务
-│   ├── providers/     # AI 模型提供商
-│   ├── utils/         # 工具函数
-│   └── index.ts       # 主入口
-├── dist/              # 构建输出
-├── package.json       # 项目配置
-├── tsconfig.json      # TypeScript 配置
-├── install.sh         # macOS/Linux 安装脚本
-├── install-windows.ps1 # Windows 安装脚本
-└── README.md          # 项目说明
+│   ├── commands/          # 命令处理模块
+│   ├── config/            # 配置管理
+│   ├── gateway/           # 网关服务
+│   ├── providers/         # AI提供商接口
+│   ├── utils/             # 工具函数
+│   └── index.ts           # 主入口
+├── user/                  # 用户数据
+├── install-windows.ps1    # Windows安装脚本
+├── install.sh             # macOS/Linux安装脚本
+├── package.json           # 项目配置
+├── tsconfig.json          # TypeScript配置
+└── README.md              # 项目说明
 ```
 
-## 开发指南
+## 🔍 故障排除
 
-### 开发模式
+### 依赖安装失败
 
 ```bash
-# 启动开发模式
-npm run dev
+# 清除 npm 缓存
+npm cache clean --force
+
+# 重新安装依赖
+npm install
 ```
 
-### 构建项目
+### 构建失败
+
+确保 Node.js 版本 >= 18.0，并且 TypeScript 已正确安装。
+
+### 打包失败
+
+如果 `npm run pkg` 失败，可能是因为 pkg 包的兼容性问题：
 
 ```bash
-# 构建项目
-npm run build
-```
+# 安装特定版本的 pkg
+npm install pkg@5.8.1
 
-### 打包为可执行文件
-
-```bash
-# 构建并打包
+# 重新打包
 npm run pkg
 ```
 
-## 故障排除
+### 全局安装失败
 
-### 常见问题
+全局安装需要管理员/root权限：
 
-1. **依赖安装失败**
-   - 清除 npm 缓存：`npm cache clean --force`
-   - 重新安装依赖：`npm install`
-2. **构建失败**
-   - 确保 Node.js 版本 ≥ 18.0
-   - 检查 TypeScript 配置
-3. **全局安装失败**
-   - Windows：以管理员身份运行 PowerShell
-   - macOS/Linux：使用 sudo 权限
-4. **API Key 配置问题**
-   - 确保 API Key 正确且有效
-   - 检查网络连接是否正常
+- **Windows**：以管理员身份运行PowerShell
+- **macOS/Linux**：使用 `sudo npm link`
 
-## 许可证
+## 🤝 贡献指南
 
-MIT License
+欢迎贡献代码！请按照以下步骤：
 
-## 贡献
+1. Fork 本仓库
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 打开 Pull Request
 
-欢迎提交 Issue 和 Pull Request！
+## 📄 许可证
 
-## 联系
+本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件
 
-如有问题或建议，请在 GitHub 仓库提交 Issue。
+## 📞 联系方式
+
+如有问题或建议，请通过以下方式联系：
+
+- GitHub Issues：[https://github.com/lizhelan929822-eng/XiaoLuo-Code/issues](https://github.com/lizhelan929822-eng/XiaoLuo-Code/issues)
+
+---
+
+**享受编码的乐趣！** 🎉
