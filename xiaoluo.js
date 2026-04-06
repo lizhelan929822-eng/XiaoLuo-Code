@@ -499,7 +499,7 @@ function startREPL() {
   const scriptDir = path.dirname(new URL(import.meta.url).pathname);
   const cliPath = path.join(scriptDir, 'cli.js');
   
-  const claudeProcess = spawn('node', [cliPath, 'repl', `--model=${config.model || 'claude-3-opus-20240229'}`, `--provider=${config.provider || 'anthropic'}`], {
+  const claudeProcess = spawn('node', [cliPath, 'repl', `--model=${config.model || 'claude-3-opus-20240229'}`], {
     stdio: 'inherit',
     env: process.env
   });
