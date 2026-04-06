@@ -1,4 +1,4 @@
-const { execSync } = require('child_process');
+import { execSync } from 'child_process';
 
 // Test the logo display
 console.log('Testing XiaoLuo Code logo display...');
