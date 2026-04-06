@@ -8,7 +8,6 @@ import {
   getOriginalCwd,
   getUseCoworkPlugins,
 } from '../../bootstrap/state.js'
-import { configAdapter } from '../../config/adapter.js'
 import { getRemoteManagedSettingsSyncFromCache } from '../../services/remoteManagedSettings/syncCacheState.js'
 import { uniq } from '../array.js'
 import { logForDebugging } from '../debug.js'
@@ -811,18 +810,8 @@ function loadSettingsFromDisk(): SettingsWithErrors {
  * @returns Merged settings from all available sources (always returns at least empty object)
  */
 export function getInitialSettings(): SettingsJson {
-  // 使用 XiaoLuo Code 的配置系统
-  const xlConfig = configAdapter.getConfig();
-  
-  // 转换为 claude-code-sourcemap 所需的格式
-  const settings: SettingsJson = {
-    model: xlConfig.model,
-    temperature: xlConfig.temperature,
-    maxTokens: xlConfig.maxTokens,
-    // 其他设置...
-  };
-  
-  return settings;
+  const { settings } = getSettingsWithErrors()
+  return settings || {}
 }
 
 /**

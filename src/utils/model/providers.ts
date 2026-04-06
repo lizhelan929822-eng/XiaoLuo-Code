@@ -1,28 +1,16 @@
 import type { AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS } from '../../services/analytics/index.js'
 import { isEnvTruthy } from '../envUtils.js'
-import { configAdapter } from '../../config/adapter.js'
 
-export type APIProvider = 'firstParty' | 'bedrock' | 'vertex' | 'foundry' | 'custom'
+export type APIProvider = 'firstParty' | 'bedrock' | 'vertex' | 'foundry'
 
 export function getAPIProvider(): APIProvider {
-  // 使用 XiaoLuo Code 的配置系统
-  const provider = configAdapter.getProvider();
-  
-  // 映射到 claude-code-sourcemap 的提供商类型
-  switch (provider) {
-    case 'openai':
-    case 'anthropic':
-    case 'google':
-      return 'firstParty';
-    case 'bedrock':
-      return 'bedrock';
-    case 'vertex':
-      return 'vertex';
-    case 'foundry':
-      return 'foundry';
-    default:
-      return 'custom';
-  }
+  return isEnvTruthy(process.env.CLAUDE_CODE_USE_BEDROCK)
+    ? 'bedrock'
+    : isEnvTruthy(process.env.CLAUDE_CODE_USE_VERTEX)
+      ? 'vertex'
+      : isEnvTruthy(process.env.CLAUDE_CODE_USE_FOUNDRY)
+        ? 'foundry'
+        : 'firstParty'
 }
 
 export function getAPIProviderForStatsig(): AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS {
@@ -35,8 +23,7 @@ export function getAPIProviderForStatsig(): AnalyticsMetadata_I_VERIFIED_THIS_IS
  * (or api-staging.anthropic.com for ant users).
  */
 export function isFirstPartyAnthropicBaseUrl(): boolean {
-  // 使用 XiaoLuo Code 的配置系统
-  const baseUrl = configAdapter.getBaseUrl();
+  const baseUrl = process.env.ANTHROPIC_BASE_URL
   if (!baseUrl) {
     return true
   }

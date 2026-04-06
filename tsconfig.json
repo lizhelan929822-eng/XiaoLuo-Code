@@ -15,7 +15,12 @@
     "types": ["node", "bun"],
     "typeRoots": ["node_modules/@types"],
     "jsx": "react",
-    "allowJs": true
+    "allowJs": true,
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["*", "src/*"]
+    }
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "src/utils/telemetry", "src/utils/teleport", "src/voice"]

@@ -101,9 +101,9 @@ async function main() {
   console.log('');
   
   try {
-    // 运行 claude-code-sourcemap 的 CLI
-    const claudePath = path.join(__dirname, 'claude-code-sourcemap', 'package', 'cli.js');
-    if (fs.existsSync(claudePath)) {
+    // 运行 TypeScript 编译后的 main.js
+    const mainPath = path.join(__dirname, 'dist', 'main.js');
+    if (fs.existsSync(mainPath)) {
       // 设置环境变量
       const env = {
         ...process.env,
@@ -114,7 +114,7 @@ async function main() {
       const args = process.argv.slice(2);
       
       // 启动子进程
-      const child = spawn('node', [claudePath, ...args], {
+      const child = spawn('node', [mainPath, ...args], {
         stdio: 'inherit',
         env: env
       });
@@ -128,8 +128,8 @@ async function main() {
         }
       });
     } else {
-      console.log('❌ 未找到 claude-code-sourcemap 核心文件');
-      console.log('请确保已正确克隆 claude-code-sourcemap 仓库');
+      console.log('❌ 未找到编译后的核心文件');
+      console.log('请先运行 npm run build 构建项目');
     }
   } catch (error) {
     console.log('❌ 启动失败:', error.message);
