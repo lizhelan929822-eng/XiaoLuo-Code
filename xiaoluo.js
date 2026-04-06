@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 // XiaoLuo Code 启动脚本
-// 基于 Claude Code 2.1.88
+// 基于 XiaoLuo Code 2.1.88
 
 console.log('XiaoLuo Code 启动中...');
 
