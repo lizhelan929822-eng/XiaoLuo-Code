@@ -204,6 +204,38 @@ xiaoluo stop
 npm start stop
 ```
 
+### 8. 播放音乐
+
+```bash
+# 使用全局命令
+xiaoluo Music
+
+# 或使用本地命令
+npm start Music
+```
+
+**特性：**
+- 随机播放Music文件夹中的音频文件
+- 支持多种音频格式：mp3、wav、flac、ogg、m4a
+- 自动根据操作系统选择合适的播放器
+
+### 9. 部署命令
+
+```bash
+# 运行部署脚本（自动安装全局命令）
+# Windows
+./deploy-windows.ps1
+
+# macOS / Linux
+chmod +x deploy.sh && ./deploy.sh
+```
+
+**特性：**
+- 自动安装全局命令
+- 检查Node.js版本
+- 创建Music文件夹
+- 显示部署成功信息和使用说明
+
 ## 🔧 开发模式
 
 对于开发者，可以使用开发模式运行：
