@@ -2,7 +2,8 @@ import express, { Request, Response } from 'express';
 import { Server } from 'http';
 import open from 'open';
 import { configStore, AppConfig } from '../config/store';
-import { providerList, validateProviderConfig } from '../providers';
+import { providerList, validateProviderConfig, getProvider } from '../providers';
+import { Message } from '../providers/base';
 import { logger } from '../utils/logger';
 
 const GATEWAY_PORT = 3888;
@@ -27,6 +28,11 @@ export class GatewayServer {
     // Serve main page
     this.app.get('/', (req: Request, res: Response) => {
       res.sendFile(__dirname + '/pages/index.html');
+    });
+
+    // Serve chat page
+    this.app.get('/chat', (req: Request, res: Response) => {
+      res.sendFile(__dirname + '/pages/chat.html');
     });
 
     // Get current config
@@ -117,6 +123,27 @@ export class GatewayServer {
         res.json({ valid: isValid });
       } catch (error) {
         res.json({ valid: false });
+      }
+    });
+
+    // Chat API
+    this.app.post('/api/chat', async (req: Request, res: Response) => {
+      try {
+        const { message } = req.body;
+        
+        if (!message) {
+          res.status(400).json({ error: 'Message is required' });
+          return;
+        }
+
+        const provider = getProvider();
+        const messages: Message[] = [{ role: 'user', content: message }];
+        
+        const response = await provider.chat(messages);
+        res.json({ response });
+      } catch (error) {
+        logger.error(`Chat failed: ${error}`);
+        res.status(500).json({ error: 'Chat failed' });
       }
     });
   }
