@@ -557,6 +557,7 @@ export function createDeployCommand(): Command {
   command
     .description('自动部署项目')
     .option('-p, --project <path>', '项目文件夹路径')
+    .option('-d, --deploy-prompt <prompt>', '部署需求描述')
     .action(async (options) => {
       if (!configStore.isConfigured()) {
         logger.error('尚未配置 API Key，请先运行 "xiaoluo config" 进行配置');
@@ -572,16 +573,23 @@ export function createDeployCommand(): Command {
 
       projectPath = path.resolve(projectPath);
 
-      const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout
-      });
+      let deployPrompt = options.deployPrompt || '';
+      
+      if (!deployPrompt) {
+        const rl = readline.createInterface({
+          input: process.stdin,
+          output: process.stdout
+        });
 
-      rl.question(GREEN + '请描述部署需求（直接回车使用默认部署）：' + RESET, async (answer) => {
-        rl.close();
-        const deployPrompt = answer.trim() || '分析项目并完成完整部署';
-        await startDeploy(deployPrompt, projectPath);
-      });
+        deployPrompt = await new Promise<string>((resolve) => {
+          rl.question(GREEN + '请描述部署需求（直接回车使用默认部署）：' + RESET, (answer) => {
+            rl.close();
+            resolve(answer.trim() || '分析项目并完成完整部署');
+          });
+        });
+      }
+
+      await startDeploy(deployPrompt, projectPath);
     });
 
   return command;
