@@ -163,13 +163,24 @@ function Install-XiaoLuo {
     Write-Host ""
     Write-Host "3. Installing project dependencies..." -ForegroundColor Cyan
     
-    # Clean npm cache
+    # Clean npm cache (non-fatal)
     Write-Host "Cleaning npm cache..." -ForegroundColor Cyan
-    npm cache clean --force 2>$null
+    try {
+        npm cache clean --force 2>$null
+    } catch {
+        Write-Host "Warning: Failed to clean npm cache, continuing..." -ForegroundColor Yellow
+    }
     
     # Install dependencies
-    npm install
-    if ($LASTEXITCODE -ne 0) {
+    Write-Host "Installing dependencies..." -ForegroundColor Cyan
+    try {
+        npm install
+        if ($LASTEXITCODE -ne 0) {
+            Write-Host "Error: Failed to install dependencies" -ForegroundColor Red
+            Write-Host "Please try running manually: npm install" -ForegroundColor Yellow
+            exit 1
+        }
+    } catch {
         Write-Host "Error: Failed to install dependencies" -ForegroundColor Red
         Write-Host "Please try running manually: npm install" -ForegroundColor Yellow
         exit 1
