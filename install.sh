@@ -40,6 +40,14 @@ fi
 # 克隆仓库
 echo ""
 echo "2. 克隆项目仓库..."
+
+# 检查目录是否存在
+if [ -d "XiaoLuo-Code" ]; then
+    echo "警告: XiaoLuo-Code 目录已存在"
+    echo "正在清理目录..."
+    rm -rf XiaoLuo-Code
+fi
+
 git clone https://github.com/lizhelan929822-eng/XiaoLuo-Code.git
 if [ $? -ne 0 ]; then
     echo "错误: 克隆仓库失败"
