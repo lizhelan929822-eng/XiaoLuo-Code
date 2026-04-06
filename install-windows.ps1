@@ -1,6 +1,6 @@
 #!/usr/bin/env powershell
 
-# XiaoLuo Code 一键安装脚本 (Windows) - 优化版
+# XiaoLuo Code One-click Installation Script (Windows)
 
 param(
     [switch]$Help,
@@ -11,46 +11,46 @@ param(
     [switch]$Verbose
 )
 
-# 显示帮助信息
+# Show help information
 function Show-Help {
-    Write-Host "XiaoLuo Code 安装脚本 (Windows)" -ForegroundColor Green
+    Write-Host "XiaoLuo Code Installation Script (Windows)" -ForegroundColor Green
     Write-Host ""
-    Write-Host "用法: .\install-windows.ps1 [参数]"
+    Write-Host "Usage: .\install-windows.ps1 [parameters]"
     Write-Host ""
-    Write-Host "参数:"
-    Write-Host "  --help              显示此帮助信息"
-    Write-Host "  --version <版本>    指定安装版本"
-    Write-Host "  --no-global         跳过全局安装"
-    Write-Host "  --directory <路径>  指定安装目录"
-    Write-Host "  --uninstall         卸载 XiaoLuo Code"
-    Write-Host "  --verbose           显示详细日志"
+    Write-Host "Parameters:"
+    Write-Host "  --help              Show this help information"
+    Write-Host "  --version version   Specify installation version"
+    Write-Host "  --no-global         Skip global installation"
+    Write-Host "  --directory path    Specify installation directory"
+    Write-Host "  --uninstall         Uninstall XiaoLuo Code"
+    Write-Host "  --verbose           Show detailed logs"
     Write-Host ""
-    Write-Host "示例:"
-    Write-Host "  .\install-windows.ps1              # 默认安装"
-    Write-Host "  .\install-windows.ps1 --no-global  # 不进行全局安装"
-    Write-Host "  .\install-windows.ps1 --directory D:\XiaoLuo  # 指定安装目录"
-    Write-Host "  .\install-windows.ps1 --uninstall  # 卸载"
+    Write-Host "Examples:"
+    Write-Host "  .\install-windows.ps1              # Default installation"
+    Write-Host "  .\install-windows.ps1 --no-global  # Skip global installation"
+    Write-Host "  .\install-windows.ps1 --directory D:\XiaoLuo  # Specify directory"
+    Write-Host "  .\install-windows.ps1 --uninstall  # Uninstall"
     exit 0
 }
 
-# 检查参数
+# Check parameters
 if ($Help) {
     Show-Help
 }
 
-# 设置变量
+# Set variables
 $RepoUrl = "https://github.com/lizhelan929822-eng/XiaoLuo-Code.git"
 $DefaultInstallDir = "XiaoLuo-Code"
 $InstallDir = if ($Directory) { $Directory } else { $DefaultInstallDir }
 $LogFile = "$InstallDir\install.log"
 $ErrorActionPreference = "Stop"
 
-# 创建日志目录
+# Create log directory
 if (!(Test-Path $InstallDir)) {
     New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
 }
 
-# 写入日志
+# Write log
 function Write-Log {
     param(
         [string]$Message,
@@ -70,7 +70,7 @@ function Write-Log {
     }
 }
 
-# 检查命令是否存在
+# Check if command exists
 function Test-Command {
     param(
         [string]$Command
@@ -78,202 +78,202 @@ function Test-Command {
     return Get-Command $Command -ErrorAction SilentlyContinue
 }
 
-# 检查并提升权限
+# Check admin privileges
 function Test-Admin {
     $currentUser = New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())
     return $currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
 function Request-Admin {
-    Write-Log "需要管理员权限" "WARNING"
-    Write-Host "正在请求管理员权限..." -ForegroundColor Yellow
+    Write-Log "Admin privileges required" "WARNING"
+    Write-Host "Requesting admin privileges..." -ForegroundColor Yellow
     $scriptPath = $MyInvocation.ScriptName
     Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File $scriptPath $($args -join ' ')" -Verb RunAs
     exit 0
 }
 
-# 卸载函数
+# Uninstall function
 function Uninstall-XiaoLuo {
-    Write-Log "开始卸载 XiaoLuo Code" "INFO"
+    Write-Log "Starting to uninstall XiaoLuo Code" "INFO"
     
-    # 检查是否全局安装
+    # Check if globally installed
     $globalInstall = npm list -g --depth=0 | Select-String "xiaoluo-code"
     if ($globalInstall) {
-        Write-Log "检测到全局安装，正在卸载..." "INFO"
+        Write-Log "Global installation detected, uninstalling..." "INFO"
         npm uninstall -g xiaoluo-code
         if ($LASTEXITCODE -eq 0) {
-            Write-Log "全局卸载成功" "INFO"
+            Write-Log "Global uninstallation successful" "INFO"
         } else {
-            Write-Log "全局卸载失败" "ERROR"
+            Write-Log "Global uninstallation failed" "ERROR"
         }
     }
     
-    # 清理本地目录
+    # Clean local directory
     if (Test-Path $InstallDir) {
-        Write-Log "清理本地安装目录..." "INFO"
+        Write-Log "Cleaning local installation directory..." "INFO"
         Remove-Item -Path $InstallDir -Recurse -Force
         if ($LASTEXITCODE -eq 0) {
-            Write-Log "本地目录清理成功" "INFO"
+            Write-Log "Local directory cleaned successfully" "INFO"
         } else {
-            Write-Log "本地目录清理失败" "ERROR"
+            Write-Log "Local directory cleaning failed" "ERROR"
         }
     }
     
-    Write-Log "卸载完成" "INFO"
-    Write-Host "XiaoLuo Code 已成功卸载" -ForegroundColor Green
+    Write-Log "Uninstallation completed" "INFO"
+    Write-Host "XiaoLuo Code has been successfully uninstalled" -ForegroundColor Green
     exit 0
 }
 
-# 主安装函数
+# Main installation function
 function Install-XiaoLuo {
-    Write-Host "=== XiaoLuo Code 一键安装脚本 (优化版) ===" -ForegroundColor Green
+    Write-Host "=== XiaoLuo Code One-click Installation Script (Windows) ===" -ForegroundColor Green
     Write-Host ""
     
-    # 1. 检查环境
-    Write-Log "检查环境依赖..." "INFO"
-    Write-Host "1. 检查环境依赖..." -ForegroundColor Cyan
+    # 1. Check environment
+    Write-Log "Checking environment dependencies..." "INFO"
+    Write-Host "1. Checking environment dependencies..." -ForegroundColor Cyan
     
-    # 检查 Node.js
+    # Check Node.js
     if (-not (Test-Command "node")) {
-        Write-Log "Node.js 未安装" "ERROR"
-        Write-Host "错误: Node.js 未安装，请先安装 Node.js 18.0 或更高版本" -ForegroundColor Red
-        Write-Host "下载地址: https://nodejs.org/en/download/" -ForegroundColor Yellow
+        Write-Log "Node.js not installed" "ERROR"
+        Write-Host "Error: Node.js is not installed. Please install Node.js 18.0 or higher first." -ForegroundColor Red
+        Write-Host "Download: https://nodejs.org/en/download/" -ForegroundColor Yellow
         exit 1
     }
     
     $nodeVersion = node -v
-    Write-Log "Node.js 版本: $nodeVersion" "INFO"
-    Write-Host "Node.js 版本: $nodeVersion" -ForegroundColor Green
+    Write-Log "Node.js version: $nodeVersion" "INFO"
+    Write-Host "Node.js version: $nodeVersion" -ForegroundColor Green
     
-    # 检查 npm
+    # Check npm
     if (-not (Test-Command "npm")) {
-        Write-Log "npm 未安装" "ERROR"
-        Write-Host "错误: npm 未安装" -ForegroundColor Red
+        Write-Log "npm not installed" "ERROR"
+        Write-Host "Error: npm is not installed" -ForegroundColor Red
         exit 1
     }
     
-    # 检查 git
+    # Check git
     if (-not (Test-Command "git")) {
-        Write-Log "git 未安装" "ERROR"
-        Write-Host "错误: git 未安装，请先安装 git" -ForegroundColor Red
+        Write-Log "git not installed" "ERROR"
+        Write-Host "Error: git is not installed. Please install git first." -ForegroundColor Red
         exit 1
     }
     
-    # 检查 Node.js 版本
+    # Check Node.js version
     $versionNumber = $nodeVersion -replace 'v', ''
     $majorVersion = [int]($versionNumber -split '\.')[0]
     if ($majorVersion -lt 18) {
-        Write-Log "Node.js 版本过低: $nodeVersion" "ERROR"
-        Write-Host "错误: Node.js 版本过低，请安装 18.0 或更高版本" -ForegroundColor Red
-        Write-Host "当前版本: $nodeVersion" -ForegroundColor Yellow
+        Write-Log "Node.js version too low: $nodeVersion" "ERROR"
+        Write-Host "Error: Node.js version is too low. Please install version 18.0 or higher." -ForegroundColor Red
+        Write-Host "Current version: $nodeVersion" -ForegroundColor Yellow
         exit 1
     }
     
-    # 2. 克隆仓库
-    Write-Log "克隆项目仓库..." "INFO"
+    # 2. Clone repository
+    Write-Log "Cloning project repository..." "INFO"
     Write-Host ""
-    Write-Host "2. 克隆项目仓库..." -ForegroundColor Cyan
+    Write-Host "2. Cloning project repository..." -ForegroundColor Cyan
     
     if (Test-Path $InstallDir) {
-        Write-Log "目录已存在，清理中..." "INFO"
+        Write-Log "Directory already exists, cleaning..." "INFO"
         Remove-Item -Path $InstallDir -Recurse -Force
     }
     
     if ($Version) {
-        Write-Log "克隆指定版本: $Version" "INFO"
+        Write-Log "Cloning specified version: $Version" "INFO"
         git clone --branch $Version $RepoUrl $InstallDir
     } else {
-        Write-Log "克隆最新版本" "INFO"
+        Write-Log "Cloning latest version" "INFO"
         git clone $RepoUrl $InstallDir
     }
     
     if ($LASTEXITCODE -ne 0) {
-        Write-Log "克隆仓库失败" "ERROR"
-        Write-Host "错误: 克隆仓库失败" -ForegroundColor Red
+        Write-Log "Repository cloning failed" "ERROR"
+        Write-Host "Error: Failed to clone repository" -ForegroundColor Red
         exit 1
     }
     
-    # 3. 进入项目目录
+    # 3. Enter project directory
     Set-Location $InstallDir
     
-    # 4. 安装依赖
-    Write-Log "安装项目依赖..." "INFO"
+    # 4. Install dependencies
+    Write-Log "Installing project dependencies..." "INFO"
     Write-Host ""
-    Write-Host "3. 安装项目依赖..." -ForegroundColor Cyan
+    Write-Host "3. Installing project dependencies..." -ForegroundColor Cyan
     
-    # 清理 npm 缓存
-    Write-Log "清理 npm 缓存..." "INFO"
+    # Clean npm cache
+    Write-Log "Cleaning npm cache..." "INFO"
     npm cache clean --force 2>$null
     
-    # 安装依赖
+    # Install dependencies
     npm install
     if ($LASTEXITCODE -ne 0) {
-        Write-Log "安装依赖失败" "ERROR"
-        Write-Host "错误: 安装依赖失败" -ForegroundColor Red
-        Write-Host "请尝试手动运行: npm install" -ForegroundColor Yellow
+        Write-Log "Dependency installation failed" "ERROR"
+        Write-Host "Error: Failed to install dependencies" -ForegroundColor Red
+        Write-Host "Please try running manually: npm install" -ForegroundColor Yellow
         exit 1
     }
     
-    # 5. 构建项目
-    Write-Log "构建项目..." "INFO"
+    # 5. Build project
+    Write-Log "Building project..." "INFO"
     Write-Host ""
-    Write-Host "4. 构建项目..." -ForegroundColor Cyan
+    Write-Host "4. Building project..." -ForegroundColor Cyan
     
     npm run build
     if ($LASTEXITCODE -ne 0) {
-        Write-Log "构建项目失败" "ERROR"
-        Write-Host "错误: 构建项目失败" -ForegroundColor Red
-        Write-Host "请检查 TypeScript 配置和依赖是否正确" -ForegroundColor Yellow
+        Write-Log "Project build failed" "ERROR"
+        Write-Host "Error: Failed to build project" -ForegroundColor Red
+        Write-Host "Please check TypeScript configuration and dependencies" -ForegroundColor Yellow
         exit 1
     }
     
-    # 6. 全局安装
+    # 6. Global installation
     if (-not $NoGlobal) {
-        Write-Log "全局安装..." "INFO"
+        Write-Log "Global installation..." "INFO"
         Write-Host ""
-        Write-Host "5. 全局安装..." -ForegroundColor Cyan
+        Write-Host "5. Global installation..." -ForegroundColor Cyan
         
-        # 检查管理员权限
+        # Check admin privileges
         if (-not (Test-Admin)) {
-            Write-Log "需要管理员权限进行全局安装" "WARNING"
+            Write-Log "Admin privileges required for global installation" "WARNING"
             Request-Admin "--directory $InstallDir"
         }
         
         npm link
         if ($LASTEXITCODE -ne 0) {
-            Write-Log "全局安装失败" "WARNING"
-            Write-Host "警告: 全局安装失败，可能需要管理员权限" -ForegroundColor Yellow
-            Write-Host "请尝试以管理员身份运行此脚本" -ForegroundColor Yellow
-            Write-Host "或使用 --no-global 参数跳过全局安装" -ForegroundColor Yellow
+            Write-Log "Global installation failed" "WARNING"
+            Write-Host "Warning: Global installation failed, may need admin privileges" -ForegroundColor Yellow
+            Write-Host "Please try running this script as administrator" -ForegroundColor Yellow
+            Write-Host "Or use --no-global parameter to skip global installation" -ForegroundColor Yellow
         } else {
-            Write-Log "全局安装成功" "INFO"
-            Write-Host "全局安装成功" -ForegroundColor Green
+            Write-Log "Global installation successful" "INFO"
+            Write-Host "Global installation successful" -ForegroundColor Green
         }
     }
     
-    # 7. 完成
-    Write-Log "安装完成" "INFO"
+    # 7. Complete
+    Write-Log "Installation completed" "INFO"
     Write-Host ""
-    Write-Host "=== 安装完成 ===" -ForegroundColor Green
+    Write-Host "=== Installation Completed ===" -ForegroundColor Green
     Write-Host ""
-    Write-Host "使用方法:" -ForegroundColor Cyan
+    Write-Host "Usage:" -ForegroundColor Cyan
     
     if (-not $NoGlobal) {
-        Write-Host "  1. 配置 API Key: xiaoluo config" -ForegroundColor White
-        Write-Host "  2. 启动聊天模式: xiaoluo chat" -ForegroundColor White
-        Write-Host "  3. 启动 REPL 模式: xiaoluo repl" -ForegroundColor White
+        Write-Host "  1. Configure API Key: xiaoluo config" -ForegroundColor White
+        Write-Host "  2. Start chat mode: xiaoluo" -ForegroundColor White
+        Write-Host "  3. Start REPL mode: xiaoluo repl" -ForegroundColor White
         Write-Host ""
     }
     
-    Write-Host "如果全局安装失败，可以使用以下命令运行:" -ForegroundColor Yellow
+    Write-Host "If global installation failed, you can run using:" -ForegroundColor Yellow
     Write-Host "  cd $InstallDir" -ForegroundColor White
     Write-Host "  npm start" -ForegroundColor White
     Write-Host ""
     
-    Write-Host "安装日志已保存到: $LogFile" -ForegroundColor Cyan
+    Write-Host "Installation log saved to: $LogFile" -ForegroundColor Cyan
 }
 
-# 主逻辑
+# Main logic
 if ($Uninstall) {
     Uninstall-XiaoLuo
 } else {
