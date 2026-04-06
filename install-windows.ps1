@@ -160,17 +160,16 @@ function Install-XiaoLuo {
     # 确保进入正确的目录
     if (Test-Path ".git") {
         # 已经在仓库目录内
+        Write-Host "Already in repository directory, skipping directory change" -ForegroundColor Cyan
     } else {
         Set-Location $InstallDir
+        Write-Host "Changed to directory: $InstallDir" -ForegroundColor Cyan
     }
     
     if ($LASTEXITCODE -ne 0) {
-        Write-Host "Error: Failed to clone repository" -ForegroundColor Red
+        Write-Host "Error: Failed to clone or update repository" -ForegroundColor Red
         exit 1
     }
-    
-    # 3. Enter project directory
-    Set-Location $InstallDir
     
     # 4. Install dependencies
     Write-Host ""
@@ -225,23 +224,36 @@ function Install-XiaoLuo {
         $npmGlobalPath = "C:\Users\$env:USERNAME\AppData\Roaming\npm"
         $xiaoluoCmd = "$npmGlobalPath\xiaoluo.cmd"
         $xiaoluoPwsh = "$npmGlobalPath\xiaoluo.ps1"
+        $xiaoluoDir = "$npmGlobalPath\node_modules\xiaoluo-code"
         
-        if (Test-Path $xiaoluoCmd) {
-            Write-Host "Removing existing xiaoluo.cmd..." -ForegroundColor Cyan
-            Remove-Item -Path $xiaoluoCmd -Force -ErrorAction SilentlyContinue
-        }
-        
-        if (Test-Path $xiaoluoPwsh) {
-            Write-Host "Removing existing xiaoluo.ps1..." -ForegroundColor Cyan
-            Remove-Item -Path $xiaoluoPwsh -Force -ErrorAction SilentlyContinue
+        # 检查并删除已存在的文件
+        $filesToRemove = @($xiaoluoCmd, $xiaoluoPwsh, $xiaoluoDir)
+        foreach ($file in $filesToRemove) {
+            if (Test-Path $file) {
+                Write-Host "Removing existing $file..." -ForegroundColor Cyan
+                try {
+                    Remove-Item -Path $file -Recurse -Force
+                    Write-Host "Successfully removed $file" -ForegroundColor Green
+                } catch {
+                    Write-Host "Warning: Failed to remove $file, may need admin privileges" -ForegroundColor Yellow
+                }
+            }
         }
         
         # 执行全局安装
+        Write-Host "Performing global installation..." -ForegroundColor Cyan
         npm link --force
         if ($LASTEXITCODE -ne 0) {
             Write-Host "Warning: Global installation failed, may need admin privileges" -ForegroundColor Yellow
             Write-Host "Please try running this script as administrator" -ForegroundColor Yellow
             Write-Host "Or use --no-global parameter to skip global installation" -ForegroundColor Yellow
+            
+            # 提供手动安装步骤
+            Write-Host "" -ForegroundColor Yellow
+            Write-Host "Manual installation steps:" -ForegroundColor Cyan
+            Write-Host "1. Open PowerShell as administrator" -ForegroundColor White
+            Write-Host "2. Navigate to this directory: cd $($PWD.Path)" -ForegroundColor White
+            Write-Host "3. Run: npm link --force" -ForegroundColor White
         } else {
             Write-Host "Global installation successful" -ForegroundColor Green
         }
