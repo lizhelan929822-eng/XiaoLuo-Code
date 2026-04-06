@@ -6,6 +6,7 @@ import { createConfigCommand } from './commands/config';
 import { createChatCommand } from './commands/chat';
 import { createCompleteCommand } from './commands/complete';
 import { createReplCommand } from './commands/repl';
+import { createDeployCommand } from './commands/deploy';
 import { createStopCommand } from './commands/stop';
 import { configStore } from './config/store';
 import { logger } from './utils/logger';
@@ -22,6 +23,7 @@ program.addCommand(createConfigCommand());
 program.addCommand(createChatCommand());
 program.addCommand(createCompleteCommand());
 program.addCommand(createReplCommand());
+program.addCommand(createDeployCommand());
 program.addCommand(createStopCommand());
 
 // Handle errors
