@@ -332,7 +332,9 @@ function startREPL() {
   }
   
   // 运行Claude Code in REPL mode
-  const cliPath = path.join(process.cwd(), 'cli.js');
+  // 获取脚本所在目录
+  const scriptDir = path.dirname(new URL(import.meta.url).pathname);
+  const cliPath = path.join(scriptDir, 'cli.js');
   
   const claudeProcess = spawn('node', [cliPath, 'repl'], {
     stdio: 'inherit',
