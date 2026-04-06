@@ -79,21 +79,73 @@ fi
 echo ""
 echo "5. 全局安装..."
 
-# 尝试不带 sudo 的全局安装
-npm link --force
-if [ $? -ne 0 ]; then
-    echo "警告: 全局安装失败，尝试使用 sudo 权限..."
-    # 尝试使用 sudo 安装
-    sudo npm link --force
+# 检测当前用户
+CURRENT_USER=$(whoami)
+NPM_PREFIX=$(npm config get prefix)
+
+# 检查是否是普通用户
+if [ "$CURRENT_USER" != "root" ]; then
+    # 普通用户，设置用户级别的npm前缀
+    echo "检测到普通用户，设置用户级别的npm安装..."
+    
+    # 确保用户npm目录存在
+    mkdir -p ~/.npm/bin ~/.npm/lib/node_modules
+    
+    # 设置npm前缀
+    npm config set prefix ~/.npm
+    
+    # 安装到用户目录
+    npm link --force
+    
+    # 检查是否成功
     if [ $? -ne 0 ]; then
-        echo "错误: 全局安装失败，请手动运行 sudo npm link"
+        echo "错误: 全局安装失败"
+    else
+        echo "✓ 成功安装到用户目录"
+    fi
+    
+    # 检查PATH是否包含用户npm目录
+    if [[ "$PATH" != *"$HOME/.npm/bin"* ]]; then
+        echo "正在添加 ~/.npm/bin 到 PATH..."
+        
+        # 添加到相应的shell配置文件
+        if [ -f "~/.bashrc" ]; then
+            echo 'export PATH="$HOME/.npm/bin:$PATH"' >> ~/.bashrc
+            echo "✓ 添加到 ~/.bashrc"
+        fi
+        if [ -f "~/.zshrc" ]; then
+            echo 'export PATH="$HOME/.npm/bin:$PATH"' >> ~/.zshrc
+            echo "✓ 添加到 ~/.zshrc"
+        fi
+        
+        # 立即更新当前会话的PATH
+        export PATH="$HOME/.npm/bin:$PATH"
+        echo "✓ 已更新当前会话的PATH"
+    fi
+else
+    # root用户，使用系统级安装
+    echo "检测到root用户，使用系统级安装..."
+    
+    # 尝试不带 sudo 的全局安装
+    npm link --force
+    if [ $? -ne 0 ]; then
+        echo "警告: 全局安装失败，尝试使用 sudo 权限..."
+        # 尝试使用 sudo 安装
+        sudo npm link --force
+        if [ $? -ne 0 ]; then
+            echo "错误: 全局安装失败，请手动运行 sudo npm link"
+        fi
     fi
 fi
 
 # 确保 xiaoluo 命令有执行权限
 if command -v xiaoluo &> /dev/null; then
     echo "设置 xiaoluo 命令执行权限..."
-    sudo chmod +x "$(which xiaoluo)"
+    chmod +x "$(which xiaoluo)"
+    echo "✓ 已设置执行权限"
+else
+    echo "警告: xiaoluo 命令未找到，可能安装失败"
+    echo "请尝试手动安装: cd XiaoLuo-Code && npm link"
 fi
 
 # 完成
