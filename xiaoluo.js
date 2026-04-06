@@ -172,21 +172,176 @@ const configHtml = `
       <div class="form-group">
         <label for="provider">服务商</label>
         <select id="provider">
-          <option value="anthropic">Anthropic</option>
           <option value="openai">OpenAI</option>
-          <option value="google">Google</option>
+          <option value="anthropic">Anthropic</option>
+          <option value="google">Google (DeepMind)</option>
+          <option value="meta">Meta</option>
+          <option value="mistral">Mistral AI</option>
+          <option value="xai">xAI</option>
+          <option value="bytedance">字节跳动</option>
+          <option value="baidu">百度</option>
+          <option value="aliyun">阿里云</option>
+          <option value="zhiyuan">智谱 AI</option>
+          <option value="moonshot">月之暗面 (Moonshot AI)</option>
+          <option value="deepseek">深度求索 (DeepSeek)</option>
+          <option value="iflytek">科大讯飞</option>
+          <option value="tencent">腾讯</option>
+          <option value="huawei">华为</option>
+          <option value="baichuan">百川智能</option>
+          <option value="01ai">零一万物</option>
           <option value="minimax">MiniMax</option>
+          <option value="sensetime">商汤科技</option>
         </select>
       </div>
       <div class="form-group">
         <label for="model">模型</label>
         <select id="model">
-          <option value="claude-3-opus-20240229">Claude 3 Opus</option>
-          <option value="claude-3-sonnet-20240229">Claude 3 Sonnet</option>
-          <option value="gpt-4">GPT-4</option>
-          <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-          <option value="gemini-pro">Gemini Pro</option>
-          <option value="MiniMax-M2.7">MiniMax-M2.7</option>
+          <!-- OpenAI -->
+          <option value="gpt-3.5-turbo">OpenAI - GPT-3.5-turbo</option>
+          <option value="gpt-4">OpenAI - GPT-4</option>
+          <option value="gpt-4-turbo">OpenAI - GPT-4-turbo</option>
+          <option value="gpt-4o">OpenAI - GPT-4o</option>
+          <option value="gpt-4o-audio">OpenAI - GPT-4o-audio</option>
+          <option value="gpt-5.2">OpenAI - GPT-5.2</option>
+          <option value="gpt-5.4">OpenAI - GPT-5.4</option>
+          <option value="gpt-5.4-thinking">OpenAI - GPT-5.4-Thinking</option>
+          
+          <!-- Anthropic -->
+          <option value="claude-3-haiku">Anthropic - Claude 3 Haiku</option>
+          <option value="claude-3-sonnet">Anthropic - Claude 3 Sonnet</option>
+          <option value="claude-3-opus">Anthropic - Claude 3 Opus</option>
+          <option value="claude-3.5-sonnet">Anthropic - Claude 3.5 Sonnet</option>
+          <option value="claude-4-haiku">Anthropic - Claude 4 Haiku</option>
+          <option value="claude-4-sonnet">Anthropic - Claude 4 Sonnet</option>
+          <option value="claude-4-opus">Anthropic - Claude 4 Opus</option>
+          <option value="claude-4.5-haiku">Anthropic - Claude 4.5 Haiku</option>
+          <option value="claude-4.5-sonnet">Anthropic - Claude 4.5 Sonnet</option>
+          <option value="claude-4.6-opus">Anthropic - Claude 4.6 Opus</option>
+          
+          <!-- Google (DeepMind) -->
+          <option value="gemini-1.0-pro">Google - Gemini 1.0 Pro</option>
+          <option value="gemini-1.0-ultra">Google - Gemini 1.0 Ultra</option>
+          <option value="gemini-1.5-pro">Google - Gemini 1.5 Pro</option>
+          <option value="gemini-1.5-ultra">Google - Gemini 1.5 Ultra</option>
+          <option value="gemini-2.0-pro">Google - Gemini 2.0 Pro</option>
+          <option value="gemini-2.0-ultra">Google - Gemini 2.0 Ultra</option>
+          <option value="gemini-3.0-pro">Google - Gemini 3.0 Pro</option>
+          <option value="gemini-3.0-ultra">Google - Gemini 3.0 Ultra</option>
+          <option value="gemini-3.1-pro">Google - Gemini 3.1 Pro</option>
+          <option value="gemini-3.1-ultra">Google - Gemini 3.1 Ultra</option>
+          <option value="gemma-2b">Google - Gemma 2B</option>
+          <option value="gemma-7b">Google - Gemma 7B</option>
+          <option value="gemma-3-12b">Google - Gemma 3 12B</option>
+          
+          <!-- Meta -->
+          <option value="llama-2-7b">Meta - Llama 2 (7B)</option>
+          <option value="llama-2-13b">Meta - Llama 2 (13B)</option>
+          <option value="llama-2-70b">Meta - Llama 2 (70B)</option>
+          <option value="llama-3-8b">Meta - Llama 3 (8B)</option>
+          <option value="llama-3-70b">Meta - Llama 3 (70B)</option>
+          <option value="llama-3.1-8b">Meta - Llama 3.1 (8B)</option>
+          <option value="llama-3.1-70b">Meta - Llama 3.1 (70B)</option>
+          <option value="llama-3.1-405b">Meta - Llama 3.1 (405B)</option>
+          <option value="llama-3.3">Meta - Llama 3.3</option>
+          <option value="llama-4-8b">Meta - Llama 4 (8B)</option>
+          <option value="llama-4-70b">Meta - Llama 4 (70B)</option>
+          <option value="llama-4-405b">Meta - Llama 4 (405B)</option>
+          
+          <!-- Mistral AI -->
+          <option value="mistral-7b">Mistral AI - Mistral 7B</option>
+          <option value="mixtral-8x7b">Mistral AI - Mixtral 8x7B</option>
+          <option value="mixtral-8x22b">Mistral AI - Mixtral 8x22B</option>
+          <option value="mistral-large">Mistral AI - Mistral Large</option>
+          <option value="mistral-large-2">Mistral AI - Mistral Large 2</option>
+          
+          <!-- xAI -->
+          <option value="grok-3">xAI - Grok 3</option>
+          <option value="grok-4.1">xAI - Grok 4.1</option>
+          <option value="grok-4.2">xAI - Grok 4.2</option>
+          
+          <!-- 字节跳动 -->
+          <option value="doubao-4.0">字节跳动 - 豆包大模型 4.0</option>
+          <option value="doubao-pro-4.0">字节跳动 - 豆包 Pro 4.0</option>
+          <option value="doubao-lite">字节跳动 - 豆包 Lite</option>
+          <option value="doubao-code">字节跳动 - 豆包 Code</option>
+          <option value="doubao-5.0">字节跳动 - 豆包大模型 5.0</option>
+          
+          <!-- 百度 -->
+          <option value="ernie-3.5">百度 - 文心一言 ERNIE 3.5</option>
+          <option value="ernie-4.0">百度 - 文心一言 ERNIE 4.0</option>
+          <option value="ernie-4.5">百度 - 文心一言 ERNIE 4.5</option>
+          <option value="ernie-5.0">百度 - 文心一言 ERNIE 5.0</option>
+          <option value="ernie-4.5-vl">百度 - 文心一言 ERNIE-4.5-VL</option>
+          
+          <!-- 阿里云 -->
+          <option value="qwen-2.5">阿里云 - 通义千问 Qwen 2.5</option>
+          <option value="qwen-3">阿里云 - 通义千问 Qwen 3</option>
+          <option value="qwen-3.5-max">阿里云 - 通义千问 Qwen 3.5 Max</option>
+          <option value="qwen-3.5-plus">阿里云 - 通义千问 Qwen 3.5 Plus</option>
+          <option value="qwen-3.5-lite">阿里云 - 通义千问 Qwen 3.5 Lite</option>
+          <option value="qwen-3.5-flash">阿里云 - 通义千问 Qwen 3.5 Flash</option>
+          <option value="qwen-vl">阿里云 - 通义千问 Qwen-VL</option>
+          <option value="qwen-coder">阿里云 - 通义千问 Qwen-Coder</option>
+          
+          <!-- 智谱 AI -->
+          <option value="glm-4">智谱 AI - GLM-4</option>
+          <option value="glm-4v">智谱 AI - GLM-4V</option>
+          <option value="glm-5">智谱 AI - GLM-5</option>
+          <option value="glm-5v">智谱 AI - GLM-5V</option>
+          <option value="zhiqian">智谱 AI - 智谱清言</option>
+          
+          <!-- 月之暗面 (Moonshot AI) -->
+          <option value="kimi-1.8">月之暗面 - Kimi 1.8</option>
+          <option value="kimi-2.0">月之暗面 - Kimi 2.0</option>
+          <option value="kimi-2.5">月之暗面 - Kimi 2.5</option>
+          <option value="kimi-k2">月之暗面 - Kimi K2</option>
+          
+          <!-- 深度求索 (DeepSeek) -->
+          <option value="deepseek-v3">深度求索 - DeepSeek-V3</option>
+          <option value="deepseek-v4">深度求索 - DeepSeek-V4</option>
+          <option value="deepseek-r1">深度求索 - DeepSeek-R1</option>
+          <option value="deepseek-coder">深度求索 - DeepSeek-Coder</option>
+          <option value="deepseek-math">深度求索 - DeepSeek-Math</option>
+          
+          <!-- 科大讯飞 -->
+          <option value="xinghuo-3.0">科大讯飞 - 星火大模型 3.0</option>
+          <option value="xinghuo-3.5">科大讯飞 - 星火 3.5</option>
+          <option value="xinghuo-4.0">科大讯飞 - 星火 4.0</option>
+          
+          <!-- 腾讯 -->
+          <option value="hunyuan">腾讯 - 混元大模型 (Hunyuan)</option>
+          <option value="hunyuan-text">腾讯 - 混元文本</option>
+          <option value="hunyuan-multimodal">腾讯 - 混元多模态</option>
+          <option value="hunyuan-video">腾讯 - 混元视频</option>
+          
+          <!-- 华为 -->
+          <option value="pangu-nlp">华为 - 盘古大模型 NLP</option>
+          <option value="pangu-multimodal">华为 - 盘古多模态</option>
+          <option value="pangu-science">华为 - 盘古科学计算</option>
+          <option value="pangu-weather">华为 - 盘古气象</option>
+          
+          <!-- 百川智能 -->
+          <option value="baichuan-2">百川智能 - Baichuan 2</option>
+          <option value="baichuan-3">百川智能 - Baichuan 3</option>
+          <option value="baichuan-4.0-7b">百川智能 - 百川 4.0 (7B)</option>
+          <option value="baichuan-4.0-13b">百川智能 - 百川 4.0 (13B)</option>
+          <option value="baichuan-4.0-67b">百川智能 - 百川 4.0 (67B)</option>
+          
+          <!-- 零一万物 -->
+          <option value="yi-6b">零一万物 - Yi-6B</option>
+          <option value="yi-34b">零一万物 - Yi-34B</option>
+          <option value="yi-large">零一万物 - Yi-Large</option>
+          <option value="yi-1.5">零一万物 - Yi-1.5</option>
+          
+          <!-- MiniMax -->
+          <option value="minimax-m2.7">MiniMax - MiniMax-M2.7</option>
+          <option value="abab-5.0">MiniMax - ABAB 5.0</option>
+          <option value="abab-6.0">MiniMax - ABAB 6.0</option>
+          <option value="abab-6.5">MiniMax - ABAB 6.5</option>
+          
+          <!-- 商汤科技 -->
+          <option value="sensenova-4.0">商汤科技 - 日日新 SenseNova 4.0</option>
+          <option value="sensenova-5.0">商汤科技 - 日日新 SenseNova 5.0</option>
         </select>
       </div>
       <button type="submit">保存配置</button>
