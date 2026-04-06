@@ -16,12 +16,22 @@
     <a href="https://nodejs.org/">
       <img src="https://img.shields.io/badge/Node.js-18.0%2B-brightgreen" alt="Node.js 18.0+">
     </a>
+    <a href="https://github.com/lizhelan929822-eng/XiaoLuo-Code/releases">
+      <img src="https://img.shields.io/github/v/release/lizhelan929822-eng/XiaoLuo-Code" alt="Version">
+    </a>
   </div>
 </div>
 
 ## 🎯 项目介绍
 
 XiaoLuo Code 是一个功能强大的命令行AI编程工具，核心功能基于 claude-code-sourcemap，为开发者提供智能代码辅助和聊天功能。
+
+### 🚀 版本 2.0.0 新特性
+- **网关配置**：运行 `xiaoluo config` 或首次运行时自动打开配置网页
+- **预设模型**：包含 MiniMax-M2.7 等多种模型选择
+- **直接启动**：运行 `xiaoluo` 直接启动自主任务执行对话
+- **配置完成后自动进入对话**：配置网页保存后自动启动对话
+
 
 ## ✨ 主要功能
 
@@ -127,7 +137,30 @@ xiaoluo config
 npm start config
 ```
 
-### 2. 启动聊天模式
+**特性：**
+- 自动打开配置网页
+- 支持多种AI服务商选择
+- 包含MiniMax-M2.7等多种模型
+- 配置完成后自动启动对话
+
+### 2. 直接启动自主任务执行对话
+
+```bash
+# 使用全局命令
+xiaoluo
+
+# 或使用本地命令
+npm start
+```
+
+**特性：**
+- 直接进入自主任务执行模式
+- AI会自动执行您交给的任务
+- 可以创建多个文件/文件夹
+- 询问用户同意后删除文件
+- 修改代码、自行测试、修复错误
+
+### 3. 启动聊天模式
 
 ```bash
 # 使用全局命令
@@ -137,7 +170,7 @@ xiaoluo chat
 npm start chat
 ```
 
-### 3. 代码补全
+### 4. 代码补全
 
 ```bash
 # 使用全局命令
@@ -146,22 +179,6 @@ xiaoluo complete
 # 或使用本地命令
 npm start complete
 ```
-
-### 4. 启动自主任务执行（REPL模式）
-
-```bash
-# 使用全局命令
-xiaoluo repl
-
-# 或使用本地命令
-npm start repl
-```
-
-**特性：**
-- AI会自动执行您交给的任务
-- 可以创建多个文件/文件夹
-- 询问用户同意后删除文件
-- 修改代码、自行测试、修复错误
 
 ### 5. 自动部署项目
 
