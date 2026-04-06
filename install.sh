@@ -40,14 +40,6 @@ fi
 # 克隆仓库
 echo ""
 echo "2. 克隆项目仓库..."
-
-# 检查目录是否存在
-if [ -d "XiaoLuo-Code" ]; then
-    echo "警告: XiaoLuo-Code 目录已存在"
-    echo "正在清理目录..."
-    rm -rf XiaoLuo-Code
-fi
-
 git clone https://github.com/lizhelan929822-eng/XiaoLuo-Code.git
 if [ $? -ne 0 ]; then
     echo "错误: 克隆仓库失败"
@@ -78,74 +70,10 @@ fi
 # 全局安装
 echo ""
 echo "5. 全局安装..."
-
-# 检测当前用户
-CURRENT_USER=$(whoami)
-NPM_PREFIX=$(npm config get prefix)
-
-# 检查是否是普通用户
-if [ "$CURRENT_USER" != "root" ]; then
-    # 普通用户，设置用户级别的npm前缀
-    echo "检测到普通用户，设置用户级别的npm安装..."
-    
-    # 确保用户npm目录存在
-    mkdir -p ~/.npm/bin ~/.npm/lib/node_modules
-    
-    # 设置npm前缀
-    npm config set prefix ~/.npm
-    
-    # 安装到用户目录
-    npm link --force
-    
-    # 检查是否成功
-    if [ $? -ne 0 ]; then
-        echo "错误: 全局安装失败"
-    else
-        echo "✓ 成功安装到用户目录"
-    fi
-    
-    # 检查PATH是否包含用户npm目录
-    if [[ "$PATH" != *"$HOME/.npm/bin"* ]]; then
-        echo "正在添加 ~/.npm/bin 到 PATH..."
-        
-        # 添加到相应的shell配置文件
-        if [ -f "~/.bashrc" ]; then
-            echo 'export PATH="$HOME/.npm/bin:$PATH"' >> ~/.bashrc
-            echo "✓ 添加到 ~/.bashrc"
-        fi
-        if [ -f "~/.zshrc" ]; then
-            echo 'export PATH="$HOME/.npm/bin:$PATH"' >> ~/.zshrc
-            echo "✓ 添加到 ~/.zshrc"
-        fi
-        
-        # 立即更新当前会话的PATH
-        export PATH="$HOME/.npm/bin:$PATH"
-        echo "✓ 已更新当前会话的PATH"
-    fi
-else
-    # root用户，使用系统级安装
-    echo "检测到root用户，使用系统级安装..."
-    
-    # 尝试不带 sudo 的全局安装
-    npm link --force
-    if [ $? -ne 0 ]; then
-        echo "警告: 全局安装失败，尝试使用 sudo 权限..."
-        # 尝试使用 sudo 安装
-        sudo npm link --force
-        if [ $? -ne 0 ]; then
-            echo "错误: 全局安装失败，请手动运行 sudo npm link"
-        fi
-    fi
-fi
-
-# 确保 xiaoluo 命令有执行权限
-if command -v xiaoluo &> /dev/null; then
-    echo "设置 xiaoluo 命令执行权限..."
-    chmod +x "$(which xiaoluo)"
-    echo "✓ 已设置执行权限"
-else
-    echo "警告: xiaoluo 命令未找到，可能安装失败"
-    echo "请尝试手动安装: cd XiaoLuo-Code && npm link"
+npm link
+if [ $? -ne 0 ]; then
+    echo "警告: 全局安装失败，可能需要管理员权限"
+    echo "请尝试使用 sudo 运行此脚本"
 fi
 
 # 完成
@@ -154,9 +82,8 @@ echo "=== 安装完成 ==="
 echo ""
 echo "使用方法:"
 echo "  1. 配置 API Key: xiaoluo config"
-echo "  2. 启动 REPL 模式: xiaoluo (默认)"
-echo "  3. 启动聊天模式: xiaoluo chat"
-echo "  4. 自动部署项目: xiaoluo deploy"
+echo "  2. 启动聊天模式: xiaoluo chat"
+echo "  3. 启动 REPL 模式: xiaoluo repl"
 echo ""
 echo "如果全局安装失败，可以使用以下命令运行:"
 echo "  npm start"
