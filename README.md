@@ -29,7 +29,7 @@ Invoke-WebRequest -Uri "https://raw.githubusercontent.com/lizhelan929822-eng/Xia
 
 #### macOS / Linux (bash)
 ```bash
-curl -s https://raw.githubusercontent.com/lizhelan929822-eng/XiaoLuo-Code/main/install-enhanced.sh | bash
+curl -s https://raw.githubusercontent.com/lizhelan929822-eng/XiaoLuo-Code/main/install-oneclick.sh | bash
 ```
 
 ### 详细安装方法
