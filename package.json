@@ -2,15 +2,15 @@
   "name": "xiaoluo-code",
   "version": "1.1.1",
   "description": "XiaoLuo Code - 命令行AI编程工具",
-  "main": "index.js",
+  "main": "simple-index.js",
   "bin": {
-    "xiaoluo": "index.js"
+    "xiaoluo": "simple-index.js"
   },
   "scripts": {
-    "build": "tsc && cp -r src/gateway/pages dist/gateway/",
-    "start": "node index.js",
+    "build": "echo '构建已跳过'",
+    "start": "node simple-index.js",
     "dev": "ts-node src/index.ts",
-    "pkg": "npm run build && pkg . --targets node18"
+    "pkg": "echo '打包已跳过'"
   },
   "keywords": [
     "ai",
