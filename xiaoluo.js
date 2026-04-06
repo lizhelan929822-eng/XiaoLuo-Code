@@ -486,12 +486,20 @@ function startREPL() {
     process.env.ANTHROPIC_API_KEY = config.apiKey;
   }
   
+  // 设置模型和服务商环境变量
+  if (config.model) {
+    process.env.MODEL = config.model;
+  }
+  if (config.provider) {
+    process.env.PROVIDER = config.provider;
+  }
+  
   // 运行Claude Code in REPL mode
   // 获取脚本所在目录
   const scriptDir = path.dirname(new URL(import.meta.url).pathname);
   const cliPath = path.join(scriptDir, 'cli.js');
   
-  const claudeProcess = spawn('node', [cliPath, 'repl'], {
+  const claudeProcess = spawn('node', [cliPath, 'repl', `--model=${config.model || 'claude-3-opus-20240229'}`, `--provider=${config.provider || 'anthropic'}`], {
     stdio: 'inherit',
     env: process.env
   });
