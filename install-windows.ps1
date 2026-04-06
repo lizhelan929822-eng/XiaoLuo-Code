@@ -1,98 +1,116 @@
 #!/usr/bin/env powershell
 
 # XiaoLuo Code 一键安装脚本 (Windows)
+# 和macOS体验完全一致 - 安装后直接使用 xiaoluo 命令
 
-Write-Host "=== XiaoLuo Code Installer ===" -ForegroundColor Green
+Write-Host "=== XiaoLuo Code 一键安装脚本 ===" -ForegroundColor Green
+Write-Host ""
 
-# Check requirements
-Write-Host "Checking requirements..." -ForegroundColor Cyan
+# 检查Node.js是否安装
+Write-Host "1. 检查Node.js安装情况..." -ForegroundColor Cyan
 if (-not (Get-Command node -ErrorAction SilentlyContinue)) {
-    Write-Host "Error: Node.js not found. Install Node.js 18+ first." -ForegroundColor Red
-    Write-Host "Download: https://nodejs.org" -ForegroundColor Yellow
+    Write-Host "错误: Node.js 未安装，请先安装 Node.js 18.0 或更高版本" -ForegroundColor Red
+    Write-Host "下载地址: https://nodejs.org/en/download/" -ForegroundColor Yellow
     exit 1
 }
 
+$nodeVersion = node -v
+Write-Host "Node.js 版本: $nodeVersion" -ForegroundColor Green
+
+# 检查npm是否安装
+if (-not (Get-Command npm -ErrorAction SilentlyContinue)) {
+    Write-Host "错误: npm 未安装" -ForegroundColor Red
+    exit 1
+}
+
+# 检查git是否安装
 if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-    Write-Host "Error: Git not found. Install git first." -ForegroundColor Red
+    Write-Host "错误: git 未安装，请先安装 git" -ForegroundColor Red
     exit 1
 }
 
-# Clone repository
-Write-Host "Cloning repository..." -ForegroundColor Cyan
-if (Test-Path "XiaoLuo-Code") {
-    Remove-Item "XiaoLuo-Code" -Recurse -Force
+# 检查Node.js版本
+$versionNumber = $nodeVersion -replace 'v', ''
+$majorVersion = [int]($versionNumber -split '\.')[0]
+if ($majorVersion -lt 18) {
+    Write-Host "错误: Node.js 版本过低，请安装 18.0 或更高版本" -ForegroundColor Red
+    Write-Host "当前版本: $nodeVersion" -ForegroundColor Yellow
+    exit 1
 }
+
+# 克隆仓库
+Write-Host ""
+Write-Host "2. 克隆项目仓库..." -ForegroundColor Cyan
+
+# 检查目录是否存在
+if (Test-Path "XiaoLuo-Code") {
+    Write-Host "XiaoLuo-Code 目录已存在，正在清理..." -ForegroundColor Yellow
+    Remove-Item -Path "XiaoLuo-Code" -Recurse -Force
+}
+
 git clone https://github.com/lizhelan929822-eng/XiaoLuo-Code.git
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "错误: 克隆仓库失败" -ForegroundColor Red
+    exit 1
+}
 
-# Install
+# 进入项目目录
 Set-Location "XiaoLuo-Code"
-Write-Host "Installing dependencies..." -ForegroundColor Cyan
+
+# 安装依赖
+Write-Host ""
+Write-Host "3. 安装项目依赖..." -ForegroundColor Cyan
 npm install
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "错误: 安装依赖失败" -ForegroundColor Red
+    exit 1
+}
 
-Write-Host "Building project..." -ForegroundColor Cyan
+# 构建项目
+Write-Host ""
+Write-Host "4. 构建项目..." -ForegroundColor Cyan
 npm run build
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "错误: 构建项目失败" -ForegroundColor Red
+    exit 1
+}
 
-# Global install
-Write-Host "Installing globally..." -ForegroundColor Cyan
+# 全局安装
+Write-Host ""
+Write-Host "5. 全局安装..." -ForegroundColor Cyan
+
+# 先尝试删除旧的文件
 $npmPath = "C:\Users\$env:USERNAME\AppData\Roaming\npm"
-$files = @(
+$oldFiles = @(
     "$npmPath\xiaoluo.cmd",
     "$npmPath\xiaoluo.ps1",
     "$npmPath\node_modules\xiaoluo-code"
 )
 
-foreach ($f in $files) {
-    if (Test-Path $f) {
-        Remove-Item $f -Recurse -Force -ErrorAction SilentlyContinue
+foreach ($file in $oldFiles) {
+    if (Test-Path $file) {
+        Remove-Item -Path $file -Recurse -Force -ErrorAction SilentlyContinue
     }
 }
 
+# 使用 --force 确保覆盖安装
 npm link --force
-
-# 复制批处理文件到桌面
-Write-Host "Creating desktop shortcut..." -ForegroundColor Cyan
-try {
-    $desktopPath = [Environment]::GetFolderPath("Desktop")
-    $batchFile = "$PWD\xiaoluo.bat"
-    
-    if (Test-Path $batchFile) {
-        Copy-Item -Path $batchFile -Destination "$desktopPath\xiaoluo.bat" -Force
-        Write-Host "Desktop shortcut created: $desktopPath\xiaoluo.bat" -ForegroundColor Green
-    } else {
-        Write-Host "Warning: xiaoluo.bat not found" -ForegroundColor Yellow
-    }
-} catch {
-    Write-Host "Warning: Could not create desktop shortcut" -ForegroundColor Yellow
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "警告: 全局安装失败，可能需要管理员权限" -ForegroundColor Yellow
+    Write-Host "请尝试以管理员身份运行此脚本" -ForegroundColor Yellow
 }
 
-# 验证安装并刷新环境
-Write-Host "Verifying installation..." -ForegroundColor Cyan
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-
-# 尝试刷新文件关联
-Write-Host "Refreshing file associations..." -ForegroundColor Cyan
-try {
-    $npmPath = "C:\Users\$env:USERNAME\AppData\Roaming\npm"
-    $xiaoluoCmd = "$npmPath\xiaoluo.cmd"
-    
-    if (Test-Path $xiaoluoCmd) {
-        Write-Host "xiaoluo.cmd found at: $xiaoluoCmd" -ForegroundColor Green
-    } else {
-        Write-Host "Warning: xiaoluo.cmd not found" -ForegroundColor Yellow
-    }
-} catch {
-    Write-Host "Warning: Could not verify file associations" -ForegroundColor Yellow
-}
-
-# Complete
-Write-Host "" -ForegroundColor Green
-Write-Host "=== Installation Complete ===" -ForegroundColor Green
-Write-Host "" -ForegroundColor Cyan
-Write-Host "Quick Start Methods:" -ForegroundColor Cyan
-Write-Host "1. Double-click 'xiaoluo.bat' on your desktop" -ForegroundColor White
-Write-Host "2. Or run in PowerShell: xiaoluo" -ForegroundColor White
-Write-Host "3. Or navigate to XiaoLuo-Code and run: npm start" -ForegroundColor White
-Write-Host "" -ForegroundColor Yellow
-Write-Host "First time setup:" -ForegroundColor Yellow
-Write-Host "Run 'xiaoluo config' to set your API Key" -ForegroundColor White
-Write-Host "" -ForegroundColor Green
+# 完成
+Write-Host ""
+Write-Host "=== 安装完成 ===" -ForegroundColor Green
+Write-Host ""
+Write-Host "使用方法:" -ForegroundColor Cyan
+Write-Host "  1. 配置 API Key: xiaoluo config" -ForegroundColor White
+Write-Host "  2. 启动 REPL 模式: xiaoluo" -ForegroundColor White
+Write-Host "  3. 启动聊天模式: xiaoluo chat" -ForegroundColor White
+Write-Host ""
+Write-Host "如果全局安装失败，可以使用以下命令运行:" -ForegroundColor Yellow
+Write-Host "  cd XiaoLuo-Code" -ForegroundColor White
+Write-Host "  npm start" -ForegroundColor White
+Write-Host ""
+Write-Host "安装成功！现在直接输入 'xiaoluo' 即可启动！" -ForegroundColor Green
