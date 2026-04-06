@@ -78,7 +78,7 @@ fi
 # 全局安装
 echo ""
 echo "5. 全局安装..."
-npm link
+npm link --force
 if [ $? -ne 0 ]; then
     echo "警告: 全局安装失败，可能需要管理员权限"
     echo "请尝试使用 sudo 运行此脚本"
