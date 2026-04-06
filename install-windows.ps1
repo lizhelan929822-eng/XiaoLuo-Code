@@ -59,7 +59,7 @@ function Test-Admin {
 function Request-Admin {
     Write-Host "Requesting admin privileges..." -ForegroundColor Yellow
     $scriptPath = $MyInvocation.ScriptName
-    Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File $scriptPath $($args -join ' ')" -Verb RunAs
+    Start-Process powershell.exe -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File $scriptPath $($args -join ' ' )" -Verb RunAs
     exit 0
 }
 
