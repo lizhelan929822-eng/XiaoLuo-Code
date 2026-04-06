@@ -50,6 +50,12 @@ if (!(Test-Path $InstallDir)) {
     New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
 }
 
+# Ensure log directory exists
+$LogDir = Split-Path $LogFile -Parent
+if (!(Test-Path $LogDir)) {
+    New-Item -ItemType Directory -Path $LogDir -Force | Out-Null
+}
+
 # Write log
 function Write-Log {
     param(
