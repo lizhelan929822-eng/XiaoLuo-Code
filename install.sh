@@ -78,10 +78,22 @@ fi
 # 全局安装
 echo ""
 echo "5. 全局安装..."
+
+# 尝试不带 sudo 的全局安装
 npm link --force
 if [ $? -ne 0 ]; then
-    echo "警告: 全局安装失败，可能需要管理员权限"
-    echo "请尝试使用 sudo 运行此脚本"
+    echo "警告: 全局安装失败，尝试使用 sudo 权限..."
+    # 尝试使用 sudo 安装
+    sudo npm link --force
+    if [ $? -ne 0 ]; then
+        echo "错误: 全局安装失败，请手动运行 sudo npm link"
+    fi
+fi
+
+# 确保 xiaoluo 命令有执行权限
+if command -v xiaoluo &> /dev/null; then
+    echo "设置 xiaoluo 命令执行权限..."
+    sudo chmod +x "$(which xiaoluo)"
 fi
 
 # 完成
@@ -90,8 +102,9 @@ echo "=== 安装完成 ==="
 echo ""
 echo "使用方法:"
 echo "  1. 配置 API Key: xiaoluo config"
-echo "  2. 启动聊天模式: xiaoluo chat"
-echo "  3. 启动 REPL 模式: xiaoluo repl"
+echo "  2. 启动 REPL 模式: xiaoluo (默认)"
+echo "  3. 启动聊天模式: xiaoluo chat"
+echo "  4. 自动部署项目: xiaoluo deploy"
 echo ""
 echo "如果全局安装失败，可以使用以下命令运行:"
 echo "  npm start"
