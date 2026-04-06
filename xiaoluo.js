@@ -196,6 +196,7 @@ const configHtml = `
       <div class="form-group">
         <label for="model">模型</label>
         <select id="model">
+          <option value="custom">自定义模型</option>
           <!-- OpenAI -->
           <option value="gpt-3.5-turbo">OpenAI - GPT-3.5-turbo</option>
           <option value="gpt-4">OpenAI - GPT-4</option>
@@ -344,6 +345,10 @@ const configHtml = `
           <option value="sensenova-5.0">商汤科技 - 日日新 SenseNova 5.0</option>
         </select>
       </div>
+      <div class="form-group" id="customModelGroup" style="display: none;">
+        <label for="customModel">自定义模型名称</label>
+        <input type="text" id="customModel" placeholder="输入自定义模型名称">
+      </div>
       <button type="submit">保存配置</button>
     </form>
     <div id="message" class="message" style="display: none;"></div>
@@ -357,18 +362,47 @@ const configHtml = `
         document.getElementById('apiKey').value = config.apiKey || '';
         document.getElementById('provider').value = config.provider || 'anthropic';
         document.getElementById('model').value = config.model || 'claude-3-opus-20240229';
+        document.getElementById('customModel').value = config.customModel || '';
+        
+        // 显示或隐藏自定义模型输入框
+        toggleCustomModelInput();
       } catch (error) {
         console.error('加载配置失败:', error);
+      }
+    }
+
+    // 切换自定义模型输入框的显示/隐藏
+    function toggleCustomModelInput() {
+      const modelSelect = document.getElementById('model');
+      const customModelGroup = document.getElementById('customModelGroup');
+      if (modelSelect.value === 'custom') {
+        customModelGroup.style.display = 'block';
+      } else {
+        customModelGroup.style.display = 'none';
       }
     }
 
     // 保存配置
     document.getElementById('configForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      const modelSelect = document.getElementById('model');
+      let model = modelSelect.value;
+      let customModel = '';
+      
+      if (model === 'custom') {
+        customModel = document.getElementById('customModel').value;
+        if (!customModel) {
+          alert('请输入自定义模型名称');
+          return;
+        }
+        model = customModel;
+      }
+      
       const config = {
         apiKey: document.getElementById('apiKey').value,
         provider: document.getElementById('provider').value,
-        model: document.getElementById('model').value
+        model: model,
+        customModel: customModel
       };
 
       try {
@@ -400,6 +434,9 @@ const configHtml = `
       }
     });
 
+    // 监听模型选择变化
+    document.getElementById('model').addEventListener('change', toggleCustomModelInput);
+
     // 页面加载时加载配置
     loadConfig();
   </script>
@@ -412,17 +449,18 @@ if (args.length > 0 && args[0] === 'config' || !fs.existsSync(configPath)) {
   console.log('打开配置网页...');
   
   // 创建临时配置文件（如果不存在）
-  if (!fs.existsSync(configPath)) {
-    const configDir = path.dirname(configPath);
-    if (!fs.existsSync(configDir)) {
-      fs.mkdirSync(configDir, { recursive: true });
+    if (!fs.existsSync(configPath)) {
+      const configDir = path.dirname(configPath);
+      if (!fs.existsSync(configDir)) {
+        fs.mkdirSync(configDir, { recursive: true });
+      }
+      fs.writeFileSync(configPath, JSON.stringify({
+        apiKey: '',
+        model: 'claude-3-opus-20240229',
+        provider: 'anthropic',
+        customModel: ''
+      }, null, 2));
     }
-    fs.writeFileSync(configPath, JSON.stringify({
-      apiKey: '',
-      model: 'claude-3-opus-20240229',
-      provider: 'anthropic'
-    }, null, 2));
-  }
   
   // 创建HTTP服务器
   const server = createServer((req, res) => {
