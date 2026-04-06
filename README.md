@@ -125,10 +125,14 @@ npm start config
 ### 2. 启动聊天模式
 
 ```bash
-# 使用全局命令
-xiaoluo chat
+# 使用全局命令（默认模式）
+xiaoluo
 
 # 或使用本地命令
+npm start
+
+# 也可以使用完整命令
+xiaoluo chat
 npm start chat
 ```
 
@@ -201,6 +205,7 @@ XiaoLuo-Code/
 ├── install-windows-simple.ps1  # Windows简化版安装脚本
 ├── install.sh             # macOS/Linux标准安装脚本
 ├── install-enhanced.sh    # macOS/Linux增强版安装脚本
+├── install-oneclick.sh    # 一键安装脚本
 ├── package.json           # 项目配置
 ├── tsconfig.json          # TypeScript配置
 └── README.md              # 项目说明
