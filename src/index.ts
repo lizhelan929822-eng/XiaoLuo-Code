@@ -41,8 +41,8 @@ if (args.length === 0) {
     process.exit(1);
   }
 
-  // Inject 'repl' command and re-parse
-  process.argv.push('repl');
+  // Inject 'chat' command and re-parse
+  process.argv.push('chat');
   program.parse(process.argv);
 } else {
   program.parse();
