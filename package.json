@@ -1,6 +1,6 @@
 {
   "name": "xiaoluo-code",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "XiaoLuo Code - 命令行AI编程工具",
   "main": "dist/index.js",
   "bin": {

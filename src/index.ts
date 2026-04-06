@@ -15,7 +15,11 @@ const program = new Command();
 program
   .name('xiaoluo')
   .description('XiaoLuo Code - 命令行 AI 编程助手')
-  .version('1.0.0');
+  .version('1.1.0');
+
+// 添加 -v 选项作为 --version 的别名
+program.option('-v, --version', 'Output the version number');
+
 
 // Register commands
 program.addCommand(createConfigCommand());
