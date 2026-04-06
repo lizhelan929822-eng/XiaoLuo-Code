@@ -2,9 +2,10 @@
   "name": "xiaoluo-code",
   "version": "1.1.1",
   "description": "XiaoLuo Code - 命令行AI编程工具",
-  "main": "dist/main.js",
+  "type": "module",
+  "main": "xiaoluo.js",
   "bin": {
-    "xiaoluo": "dist/main.js"
+    "xiaoluo": "xiaoluo.js"
   },
   "scripts": {
     "build": "echo '构建已跳过'",
