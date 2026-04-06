@@ -409,7 +409,6 @@ export async function startRepl(projectPath: string | null): Promise<void> {
       printLine(DIM + '  或输入项目文件夹路径后按回车' + RESET + '\n');
       continue;
     }
-
     messages.push({ role: 'user', content: fullPrompt });
 
     printLine('');

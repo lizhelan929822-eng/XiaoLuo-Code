@@ -40,6 +40,7 @@ fi
 # 克隆仓库
 echo ""
 echo "2. 克隆项目仓库..."
+<<<<<<< HEAD
 
 # 检查目录是否存在
 if [ -d "XiaoLuo-Code" ]; then
@@ -48,6 +49,8 @@ if [ -d "XiaoLuo-Code" ]; then
     rm -rf XiaoLuo-Code
 fi
 
+=======
+>>>>>>> trae/solo-agent-jSsOs4
 git clone https://github.com/lizhelan929822-eng/XiaoLuo-Code.git
 if [ $? -ne 0 ]; then
     echo "错误: 克隆仓库失败"

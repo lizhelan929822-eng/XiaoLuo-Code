@@ -17,7 +17,6 @@ program
   .description('XiaoLuo Code - 命令行 AI 编程助手')
   .version('1.1.0', '-v, --version', 'Output the version number');
 
-
 // Register commands
 program.addCommand(createConfigCommand());
 program.addCommand(createChatCommand());
@@ -36,14 +35,14 @@ const args = process.argv.slice(2);
 
 // If no arguments provided, check config and start repl
 if (args.length === 0) {
-  if (!configStore.isConfigured()) {
-    logger.error('尚未配置 API Key，请先运行 "xiaoluo config" 进行配置');
-    console.log('\n运行 "xiaoluo config" 进行配置\n');
-    process.exit(1);
-  }
+    if (!configStore.isConfigured()) {
+      logger.error('尚未配置 API Key，请先运行 "xiaoluo config" 进行配置');
+      console.log('\n运行 "xiaoluo config" 进行配置\n');
+      process.exit(1);
+    }
 
-  // Inject 'chat' command and re-parse
-  process.argv.push('chat');
+  // Inject 'repl' command and re-parse
+  process.argv.push('repl');
   program.parse(process.argv);
 } else {
   program.parse();
