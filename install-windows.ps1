@@ -208,7 +208,7 @@ function Install-XiaoLuo {
             Request-Admin "--directory $InstallDir"
         }
         
-        npm link
+        npm link --force
         if ($LASTEXITCODE -ne 0) {
             Write-Host "Warning: Global installation failed, may need admin privileges" -ForegroundColor Yellow
             Write-Host "Please try running this script as administrator" -ForegroundColor Yellow
