@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-XiaoLuo Code 是一个功能强大的命令行AI编程工具，为开发者提供智能代码辅助和聊天功能。
+XiaoLuo Code 是一个功能强大的命令行AI编程工具，核心功能基于 claude-code-sourcemap，为开发者提供智能代码辅助和聊天功能。
 
 ## ✨ 主要功能
 

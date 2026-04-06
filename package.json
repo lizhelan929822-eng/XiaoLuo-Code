@@ -1,16 +1,14 @@
 {
   "name": "xiaoluo-code",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "XiaoLuo Code - 命令行AI编程工具",
-  "main": "dist/index.js",
+  "main": "index.js",
   "bin": {
-    "xiaoluo": "dist/index.js"
+    "xiaoluo": "index.js"
   },
   "scripts": {
-    "build": "tsc && cp -r src/gateway/pages dist/gateway/",
-    "start": "node dist/index.js",
-    "dev": "ts-node src/index.ts",
-    "pkg": "npm run build && pkg . --targets node18"
+    "start": "node index.js",
+    "pkg": "pkg . --targets node18"
   },
   "keywords": [
     "ai",
@@ -30,8 +28,6 @@
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^22.19.17",
-    "pkg": "^5.8.1",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.6.0"
+    "pkg": "^5.8.1"
   }
 }
