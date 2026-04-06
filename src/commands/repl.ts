@@ -252,16 +252,18 @@ export async function startRepl(projectPath: string | null): Promise<void> {
   // 自主执行任务的函数
   const executeTask = async (userPrompt: string): Promise<void> => {
     let iteration = 0;
-    const maxIterations = 20; // 防止无限循环
+    const maxIterations = 5; // 减少最大轮次到5次
+    let isFirstIteration = true;
 
     while (iteration < maxIterations) {
       iteration++;
       printLine(YELLOW + `\n=== 执行轮次 ${iteration}/${maxIterations} ===` + RESET);
 
-      // 构建带有项目上下文的提示词
+      // 只有第一轮构建项目上下文，后续轮次直接使用对话历史
       let fullPrompt = userPrompt;
-      if (projectPath) {
+      if (isFirstIteration && projectPath) {
         fullPrompt = buildProjectContext(userPrompt, projectPath);
+        isFirstIteration = false;
       }
 
       messages.push({ role: 'user', content: fullPrompt });
@@ -300,9 +302,14 @@ export async function startRepl(projectPath: string | null): Promise<void> {
         process.stdout.write('\r' + ' '.repeat(50) + '\r');
         process.stdout.write('\x1b[2K');
 
-        // 检查是否任务完成
-        const isComplete = /(完成|done|complete|成功|finish)/i.test(cleanResponse) && 
-                          !/(继续|继续执行|还有|还需要|待修复)/i.test(cleanResponse);
+        // 改进任务完成检测 - 检查是否有更多代码/命令要执行
+        const hasMoreWork = /(继续|接下来|然后|还需要|待|下一步)/i.test(cleanResponse) && 
+                           !/(完成|done|complete|成功|finish)/i.test(cleanResponse);
+        
+        // 检查是否只是说明性文字，没有更多代码操作
+        const isJustSummary = !extractFileModifications(cleanResponse).length && 
+                             !extractCommands(cleanResponse).length && 
+                             /(完成|done|complete|成功|finish|总结|摘要)/i.test(cleanResponse);
 
         // 先处理文件操作
         const modifications = extractFileModifications(cleanResponse);
@@ -356,17 +363,17 @@ export async function startRepl(projectPath: string | null): Promise<void> {
           }
         }
 
-        // 如果有错误或任务未完成，继续执行
-        if (hasErrors || !isComplete) {
-          let nextPrompt = '继续执行任务';
+        // 只有确实需要继续时才执行下一轮
+        if (hasErrors || hasMoreWork) {
+          let nextPrompt = '继续执行';
           if (commandOutputs.length > 0) {
-            nextPrompt += '\n\n上一轮执行结果：\n' + commandOutputs.join('\n\n');
+            nextPrompt += '\n\n执行结果：\n' + commandOutputs.join('\n\n');
           }
           if (hasErrors) {
-            nextPrompt += '\n\n请修复错误后继续。';
+            nextPrompt += '\n\n请修复错误。';
           }
           userPrompt = nextPrompt;
-          printLine(YELLOW + '\n继续执行下一轮...' + RESET);
+          printLine(YELLOW + '\n继续执行...' + RESET);
           continue;
         }
 
