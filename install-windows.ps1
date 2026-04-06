@@ -138,17 +138,30 @@ function Install-XiaoLuo {
     Write-Host ""
     Write-Host "2. Cloning project repository..." -ForegroundColor Cyan
     
-    if (Test-Path $InstallDir) {
-        Write-Host "Directory already exists, cleaning..." -ForegroundColor Yellow
-        Remove-Item -Path $InstallDir -Recurse -Force
+    # 检查当前目录是否已经是XiaoLuo-Code仓库
+    if (Test-Path ".git") {
+        Write-Host "Current directory is already a git repository, updating..." -ForegroundColor Cyan
+        git pull
+    } else {
+        if (Test-Path $InstallDir) {
+            Write-Host "Directory already exists, cleaning..." -ForegroundColor Yellow
+            Remove-Item -Path $InstallDir -Recurse -Force
+        }
+        
+        if ($Version) {
+            Write-Host "Cloning specified version: $Version" -ForegroundColor Cyan
+            git clone --branch $Version $RepoUrl $InstallDir
+        } else {
+            Write-Host "Cloning latest version" -ForegroundColor Cyan
+            git clone $RepoUrl $InstallDir
+        }
     }
     
-    if ($Version) {
-        Write-Host "Cloning specified version: $Version" -ForegroundColor Cyan
-        git clone --branch $Version $RepoUrl $InstallDir
+    # 确保进入正确的目录
+    if (Test-Path ".git") {
+        # 已经在仓库目录内
     } else {
-        Write-Host "Cloning latest version" -ForegroundColor Cyan
-        git clone $RepoUrl $InstallDir
+        Set-Location $InstallDir
     }
     
     if ($LASTEXITCODE -ne 0) {
@@ -208,6 +221,22 @@ function Install-XiaoLuo {
             Request-Admin "--directory $InstallDir"
         }
         
+        # 尝试删除已存在的文件
+        $npmGlobalPath = "C:\Users\$env:USERNAME\AppData\Roaming\npm"
+        $xiaoluoCmd = "$npmGlobalPath\xiaoluo.cmd"
+        $xiaoluoPwsh = "$npmGlobalPath\xiaoluo.ps1"
+        
+        if (Test-Path $xiaoluoCmd) {
+            Write-Host "Removing existing xiaoluo.cmd..." -ForegroundColor Cyan
+            Remove-Item -Path $xiaoluoCmd -Force -ErrorAction SilentlyContinue
+        }
+        
+        if (Test-Path $xiaoluoPwsh) {
+            Write-Host "Removing existing xiaoluo.ps1..." -ForegroundColor Cyan
+            Remove-Item -Path $xiaoluoPwsh -Force -ErrorAction SilentlyContinue
+        }
+        
+        # 执行全局安装
         npm link --force
         if ($LASTEXITCODE -ne 0) {
             Write-Host "Warning: Global installation failed, may need admin privileges" -ForegroundColor Yellow
