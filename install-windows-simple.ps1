@@ -1,8 +1,6 @@
 #!/usr/bin/env powershell
 
-# XiaoLuo Code 一键安装脚本 (Windows) - 简化版
-
-Write-Host "=== XiaoLuo Code 一键安装脚本 ===" -ForegroundColor Green
+Write-Host "=== XiaoLuo Code 安装脚本 ===" -ForegroundColor Green
 Write-Host ""
 
 # 检查Node.js是否安装
@@ -41,6 +39,13 @@ if ($majorVersion -lt 18) {
 # 克隆仓库
 Write-Host ""
 Write-Host "2. 克隆项目仓库..." -ForegroundColor Cyan
+
+# 清理已存在的目录
+if (Test-Path "XiaoLuo-Code") {
+    Write-Host "清理已存在的目录..." -ForegroundColor Yellow
+    Remove-Item -Path "XiaoLuo-Code" -Recurse -Force
+}
+
 git clone https://github.com/lizhelan929822-eng/XiaoLuo-Code.git
 if ($LASTEXITCODE -ne 0) {
     Write-Host "错误: 克隆仓库失败" -ForegroundColor Red
@@ -83,7 +88,7 @@ Write-Host "=== 安装完成 ===" -ForegroundColor Green
 Write-Host ""
 Write-Host "使用方法:"
 Write-Host "  1. 配置 API Key: xiaoluo config"
-Write-Host "  2. 启动聊天模式: xiaoluo chat"
+Write-Host "  2. 启动聊天模式: xiaoluo"
 Write-Host "  3. 启动 REPL 模式: xiaoluo repl"
 Write-Host ""
 Write-Host "如果全局安装失败，可以使用以下命令运行:"
