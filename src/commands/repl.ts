@@ -238,88 +238,6 @@ export async function startRepl(projectPath: string | null): Promise<void> {
     process.stdout.write(line + '\n');
   };
 
-  // Claude Code风格代码边框
-  const printResponseWithBorder = (response: string) => {
-    const lines = response.split('\n');
-    let inCodeBlock = false;
-    let codeType = '';
-    let filePath = '';
-    let maxWidth = 60;
-
-    const getBorderColor = () => {
-      if (['bash', 'shell', 'sh', 'command', 'terminal'].includes(codeType.toLowerCase())) return GREEN;
-      if (['html', 'css', 'svg'].includes(codeType.toLowerCase())) return YELLOW;
-      return CYAN;
-    };
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-
-      // 检测代码块开始
-      const codeStartMatch = line.match(/^```(\S*)/);
-      if (codeStartMatch && !inCodeBlock) {
-        inCodeBlock = true;
-        codeType = codeStartMatch[1] || '';
-
-        // 提取文件路径
-        const fullMatch = line.match(/^```(\S*)[\s]*(?:file|filename|filepath)?:?\s*(.+)?/);
-        if (fullMatch) {
-          filePath = fullMatch[2] || '';
-        } else {
-          filePath = '';
-        }
-
-        const borderColor = getBorderColor();
-
-        // 计算宽度
-        const displayPath = filePath || codeType || 'code';
-        maxWidth = Math.max(displayPath.length + 4, 40);
-
-        // 顶部边框
-        if (filePath) {
-          printLine(borderColor + '╭─ ' + WHITE + filePath + ' ' + '─'.repeat(Math.max(0, maxWidth - filePath.length - 3)) + '╮' + RESET);
-        } else {
-          printLine(borderColor + '╭' + '─'.repeat(maxWidth) + '╮' + RESET);
-        }
-        continue;
-      }
-
-      // 检测代码块结束
-      if (line === '```' && inCodeBlock) {
-        inCodeBlock = false;
-        const borderColor = getBorderColor();
-        printLine(borderColor + '╰' + '─'.repeat(maxWidth) + '╯' + RESET);
-        filePath = '';
-        codeType = '';
-        continue;
-      }
-
-      // 在代码块内
-      if (inCodeBlock) {
-        const borderColor = getBorderColor();
-        const paddedLine = line.length > maxWidth - 2 ? line.slice(0, maxWidth - 2) : line;
-        printLine(borderColor + '│ ' + RESET + WHITE + paddedLine + ' '.repeat(Math.max(0, maxWidth - paddedLine.length - 1)) + borderColor + ' │' + RESET);
-      } else {
-        // 普通文本
-        printLine(line);
-      }
-    }
-  };
-
-  const printResponse = (response: string, streaming: boolean = false) => {
-    const lines = response.split('\n');
-    for (const line of lines) {
-      if (streaming) {
-        process.stdout.write(DIM + '  ' + line + RESET + '\r');
-      } else {
-        printLine(DIM + '  ' + line + RESET);
-      }
-    }
-    if (streaming) {
-      process.stdout.write('\n');
-    }
-  };
-
   const rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -329,6 +247,145 @@ export async function startRepl(projectPath: string | null): Promise<void> {
     return new Promise((resolve) => {
       rl.question(GREEN + '\n> ' + RESET, resolve);
     });
+  };
+
+  // 自主执行任务的函数
+  const executeTask = async (userPrompt: string): Promise<void> => {
+    let iteration = 0;
+    const maxIterations = 20; // 防止无限循环
+
+    while (iteration < maxIterations) {
+      iteration++;
+      printLine(YELLOW + `\n=== 执行轮次 ${iteration}/${maxIterations} ===` + RESET);
+
+      // 构建带有项目上下文的提示词
+      let fullPrompt = userPrompt;
+      if (projectPath) {
+        fullPrompt = buildProjectContext(userPrompt, projectPath);
+      }
+
+      messages.push({ role: 'user', content: fullPrompt });
+
+      printLine('');
+      process.stdout.write(DIM + 'Thinking' + RESET);
+
+      currentResponse = '';
+      isStreaming = true;
+      shouldStop = false;
+      let lastCleanLength = 0;
+
+      try {
+        const onChunk = (chunk: string): boolean => {
+          if (shouldStop) {
+            return false;
+          }
+          currentResponse += chunk;
+          const clean = currentResponse.replace(/<think>[\s\S]*?<\/think>/gi, '');
+          const newContent = clean.slice(lastCleanLength);
+          lastCleanLength = clean.length;
+          if (newContent) {
+            process.stdout.write(newContent);
+          }
+          return !shouldStop;
+        };
+
+        const fullResponse = await provider.chatStream(messages, onChunk);
+
+        let cleanResponse = fullResponse
+          .replace(/<think>[\s\S]*?<\/think>/gi, '')
+          .trim();
+
+        isStreaming = false;
+
+        process.stdout.write('\r' + ' '.repeat(50) + '\r');
+        process.stdout.write('\x1b[2K');
+
+        // 检查是否任务完成
+        const isComplete = /(完成|done|complete|成功|finish)/i.test(cleanResponse) && 
+                          !/(继续|继续执行|还有|还需要|待修复)/i.test(cleanResponse);
+
+        // 先处理文件操作
+        const modifications = extractFileModifications(cleanResponse);
+        for (const mod of modifications) {
+          await applyModification(mod, projectPath);
+        }
+
+        // 执行命令
+        const commands = extractCommands(cleanResponse);
+        let hasErrors = false;
+        const commandOutputs: string[] = [];
+
+        for (const cmd of commands) {
+          try {
+            printLine('\n' + GREEN + '[Running] ' + WHITE + cmd + RESET);
+            const { stdout, stderr } = await execPromise(cmd, {
+              cwd: projectPath || process.cwd(),
+              timeout: 120000
+            });
+            if (stdout) {
+              printLine(DIM + stdout + RESET);
+              commandOutputs.push(`Command: ${cmd}\nSTDOUT: ${stdout}`);
+            }
+            if (stderr) {
+              printLine(YELLOW + stderr + RESET);
+              commandOutputs.push(`Command: ${cmd}\nSTDERR: ${stderr}`);
+              hasErrors = true;
+            }
+            printLine(GREEN + '[Done] ' + cmd + RESET);
+          } catch (error: any) {
+            printLine(RED + '[Error] ' + error.message + RESET);
+            commandOutputs.push(`Command: ${cmd}\nERROR: ${error.message}`);
+            hasErrors = true;
+          }
+        }
+
+        messages.push({ role: 'assistant', content: cleanResponse });
+
+        // 打印执行摘要
+        printLine('');
+        if (modifications.length > 0) {
+          for (const mod of modifications) {
+            if (mod.isDelete) {
+              printLine(RED + '[删除] ' + WHITE + mod.path + RESET);
+            } else {
+              const isNew = mod.isNew !== false;
+              const color = isNew ? CYAN : YELLOW;
+              const label = isNew ? '[新增]' : '[修改]';
+              printLine(color + label + ' ' + WHITE + mod.path + RESET);
+            }
+          }
+        }
+
+        // 如果有错误或任务未完成，继续执行
+        if (hasErrors || !isComplete) {
+          let nextPrompt = '继续执行任务';
+          if (commandOutputs.length > 0) {
+            nextPrompt += '\n\n上一轮执行结果：\n' + commandOutputs.join('\n\n');
+          }
+          if (hasErrors) {
+            nextPrompt += '\n\n请修复错误后继续。';
+          }
+          userPrompt = nextPrompt;
+          printLine(YELLOW + '\n继续执行下一轮...' + RESET);
+          continue;
+        }
+
+        // 任务完成
+        printLine(GREEN + '\n✅ 任务完成！' + RESET);
+        break;
+
+      } catch (error) {
+        isStreaming = false;
+        process.stdout.write('\n');
+        printLine(RED + 'Error: ' + error + RESET + '\n');
+        messages.pop();
+        break;
+      }
+    }
+
+    if (iteration >= maxIterations) {
+      printLine(YELLOW + '\n⚠️ 已达到最大执行轮次，请手动检查结果。' + RESET);
+    }
   };
 
   printPrompt();
@@ -365,7 +422,6 @@ export async function startRepl(projectPath: string | null): Promise<void> {
     if (fs.existsSync(processedInput) && fs.statSync(processedInput).isDirectory()) {
       projectPath = processedInput;
       printLine(DIM + '\nSwitching project to: ' + WHITE + processedInput + RESET);
-      // 检查是否为空文件夹
       const { files, dirs } = countFiles(processedInput);
       if (files > 0 || dirs > 0) {
         analyzeAndPrintProject(processedInput);
@@ -378,30 +434,12 @@ export async function startRepl(projectPath: string | null): Promise<void> {
     // 检查是否是文件拖放
     if (fs.existsSync(processedInput) && fs.statSync(processedInput).isFile()) {
       if (!projectPath) {
-        // 如果没有项目文件夹，将文件所在目录作为项目文件夹
         projectPath = path.dirname(processedInput);
         printLine(DIM + '\nSwitching project to: ' + WHITE + projectPath + RESET);
         analyzeAndPrintProject(projectPath);
       }
     }
     
-    // 构建完整的项目上下文
-    let fullPrompt = input;
-    if (projectPath) {
-      fullPrompt = buildProjectContext(input, projectPath);
-    }
-    
-    // 如果是文件拖放，添加文件内容到上下文
-    if (fs.existsSync(processedInput) && fs.statSync(processedInput).isFile()) {
-      const fileContent = readFileContent(processedInput);
-      if (fileContent) {
-        const fileName = path.basename(processedInput);
-        printLine(DIM + '\n[File Dropped] ' + WHITE + fileName + RESET);
-        // 将文件内容添加到用户输入
-        fullPrompt += '\n\n[File Content]\n' + fileContent;
-      }
-    }
-
     // 必须先选择项目文件夹才能对话
     if (!projectPath) {
       printLine(RED + '\n⚠️ 请先选择项目文件夹！' + RESET);
@@ -409,106 +447,20 @@ export async function startRepl(projectPath: string | null): Promise<void> {
       printLine(DIM + '  或输入项目文件夹路径后按回车' + RESET + '\n');
       continue;
     }
-    messages.push({ role: 'user', content: fullPrompt });
 
-    printLine('');
-    process.stdout.write(DIM + 'Thinking' + RESET);
-    let dotCount = 0;
-
-    currentResponse = '';
-    isStreaming = true;
-    shouldStop = false;
-    let thinkingCleared = false;
-    let lastCleanLength = 0;
-    let thinkingLineCount = 1;
-
-    try {
-      const onChunk = (chunk: string): boolean => {
-        if (shouldStop) {
-          return false;
-        }
-        currentResponse += chunk;
-        // 直接显示（移除思考标签）
-        const clean = currentResponse.replace(/<think>[\s\S]*?<\/think>/gi, '');
-        const newContent = clean.slice(lastCleanLength);
-        lastCleanLength = clean.length;
-        if (newContent) {
-          process.stdout.write(newContent);
-        }
-        return !shouldStop;
-      };
-
-
-      const fullResponse = await provider.chatStream(messages, onChunk);
-
-      // 移除思考标签
-      let cleanResponse = fullResponse
-        .replace(/<think>[\s\S]*?<\/think>/gi, '')
-        .trim();
-
-      isStreaming = false;
-
-      // 清除Thinking行
-      process.stdout.write('\r' + ' '.repeat(50) + '\r');
-      process.stdout.write('\x1b[2K'); // 清除当前行
-
-      // 先处理文件操作（删除需要确认）
-      const modifications = extractFileModifications(cleanResponse);
-      for (const mod of modifications) {
-        await applyModification(mod, projectPath);
+    // 如果是文件拖放，添加文件内容到上下文
+    let finalInput = input;
+    if (fs.existsSync(processedInput) && fs.statSync(processedInput).isFile()) {
+      const fileContent = readFileContent(processedInput);
+      if (fileContent) {
+        const fileName = path.basename(processedInput);
+        printLine(DIM + '\n[File Dropped] ' + WHITE + fileName + RESET);
+        finalInput += '\n\n[File Content]\n' + fileContent;
       }
-
-      // 执行命令
-      const commands = extractCommands(cleanResponse);
-      for (const cmd of commands) {
-        try {
-          printLine('\n' + GREEN + '[Running] ' + WHITE + cmd + RESET);
-          const { stdout, stderr } = await execPromise(cmd, {
-            cwd: projectPath || process.cwd(),
-            timeout: 120000
-          });
-          if (stdout) {
-            printLine(DIM + stdout + RESET);
-          }
-          if (stderr) {
-            printLine(YELLOW + stderr + RESET);
-          }
-          printLine(GREEN + '[Done] ' + cmd + RESET);
-        } catch (error: any) {
-          printLine(RED + '[Error] ' + error.message + RESET);
-        }
-      }
-
-      messages.push({ role: 'assistant', content: cleanResponse });
-
-      // 打印响应
-      printLine('');
-      if (modifications.length > 0) {
-        // 有代码操作，打印摘要和代码内容
-        for (const mod of modifications) {
-          if (mod.isDelete) {
-            printLine(RED + '[删除] ' + WHITE + mod.path + RESET);
-          } else {
-            const isNew = mod.isNew !== false; // 默认为true
-            const color = isNew ? CYAN : YELLOW;
-            const label = isNew ? '[新增]' : '[修改]';
-            printLine(color + label + ' ' + WHITE + mod.path + RESET);
-            // 打印代码内容，带颜色
-            printLine(color + mod.content + RESET);
-          }
-        }
-      } else {
-        // 无代码操作，直接打印AI回复
-        printLine(DIM + cleanResponse + RESET);
-      }
-      printLine('');
-
-    } catch (error) {
-      isStreaming = false;
-      process.stdout.write('\n');
-      printLine(RED + 'Error: ' + error + RESET + '\n');
-      messages.pop();
     }
+
+    // 开始自主执行任务
+    await executeTask(finalInput);
   }
 
   process.stdin.removeListener('data', escHandler);
@@ -516,16 +468,19 @@ export async function startRepl(projectPath: string | null): Promise<void> {
 }
 
 function buildProjectContext(userInput: string, projectPath: string): string {
-  // 智能编程助手 - 判断是否需要生成代码
+  // 智能编程助手 - 自主完成任务
   const context = '<system>\n' +
-    '你是一个编程助手，主要帮助用户编写和修改代码。\n' +
-    '规则：\n' +
-    '1. 如果用户只是打招呼或闲聊，正常回复即可\n' +
-    '2. 如果用户要求编写、修改、查看代码，才生成代码块\n' +
-    '3. 代码块格式：```file:文件名\n代码内容\n```\n' +
-    '4. 所有代码文件会自动保存到 ' + projectPath + '\n' +
-    '5. 执行命令用：```bash\n命令\n```\n' +
-    '6. 不要输出无关的解释，直接输出代码\n' +
+    '你是一个专业的自主编程助手，能够完成从需求到实现的完整任务。\n' +
+    '核心规则：\n' +
+    '1. 任务执行流程：理解需求 → 制定计划 → 编写代码 → 测试验证 → 修复问题 → 完成\n' +
+    '2. 可以创建多个文件和文件夹\n' +
+    '3. 如需删除文件，使用：```delete 文件路径\n```，系统会询问用户确认\n' +
+    '4. 创建/修改文件格式：```file:文件名\n代码内容\n```\n' +
+    '5. 执行测试/命令用：```bash\n命令\n```\n' +
+    '6. 所有文件会自动保存到 ' + projectPath + '\n' +
+    '7. 如果测试失败，分析错误并修复，重新测试直到成功\n' +
+    '8. 自主执行整个流程，直到任务完成\n' +
+    '9. 最后用一个简短的摘要说明任务完成情况\n' +
     '</system>\n\n' +
     '<user>' + userInput + '</user>';
 
