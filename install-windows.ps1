@@ -49,6 +49,22 @@ foreach ($f in $files) {
 
 npm link --force
 
+# 复制批处理文件到桌面
+Write-Host "Creating desktop shortcut..." -ForegroundColor Cyan
+try {
+    $desktopPath = [Environment]::GetFolderPath("Desktop")
+    $batchFile = "$PWD\xiaoluo.bat"
+    
+    if (Test-Path $batchFile) {
+        Copy-Item -Path $batchFile -Destination "$desktopPath\xiaoluo.bat" -Force
+        Write-Host "Desktop shortcut created: $desktopPath\xiaoluo.bat" -ForegroundColor Green
+    } else {
+        Write-Host "Warning: xiaoluo.bat not found" -ForegroundColor Yellow
+    }
+} catch {
+    Write-Host "Warning: Could not create desktop shortcut" -ForegroundColor Yellow
+}
+
 # 验证安装并刷新环境
 Write-Host "Verifying installation..." -ForegroundColor Cyan
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
@@ -71,12 +87,12 @@ try {
 # Complete
 Write-Host "" -ForegroundColor Green
 Write-Host "=== Installation Complete ===" -ForegroundColor Green
-Write-Host "Use 'xiaoluo config' to set API Key" -ForegroundColor White
-Write-Host "Use 'xiaoluo' to start REPL mode" -ForegroundColor White
-Write-Host "Use 'xiaoluo chat' to start chat mode" -ForegroundColor White
+Write-Host "" -ForegroundColor Cyan
+Write-Host "Quick Start Methods:" -ForegroundColor Cyan
+Write-Host "1. Double-click 'xiaoluo.bat' on your desktop" -ForegroundColor White
+Write-Host "2. Or run in PowerShell: xiaoluo" -ForegroundColor White
+Write-Host "3. Or navigate to XiaoLuo-Code and run: npm start" -ForegroundColor White
 Write-Host "" -ForegroundColor Yellow
-Write-Host "If 'xiaoluo' doesn't work, try:" -ForegroundColor Yellow
-Write-Host "1. Close and reopen PowerShell" -ForegroundColor White
-Write-Host "2. Or use: node $npmPath\node_modules\xiaoluo-code\dist\index.js" -ForegroundColor White
-Write-Host "3. Or navigate to XiaoLuo-Code directory and run: npm start" -ForegroundColor White
+Write-Host "First time setup:" -ForegroundColor Yellow
+Write-Host "Run 'xiaoluo config' to set your API Key" -ForegroundColor White
 Write-Host "" -ForegroundColor Green
