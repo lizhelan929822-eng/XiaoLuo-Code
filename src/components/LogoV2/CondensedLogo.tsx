@@ -81,14 +81,16 @@ export function CondensedLogo() {
   const truncatedCwd = truncatePath(cwd, Math.max(cwdAvailableWidth, 10));
   let t4;
   if ($[7] === Symbol.for("react.memo_cache_sentinel")) {
-    t4 = isFullscreenEnvEnabled() ? <AnimatedClawd /> : <Clawd />;
+    t4 = <Text>╔═════════════════════╗
+║    XiaoLuo Code     ║
+╚═════════════════════╝</Text>;
     $[7] = t4;
   } else {
     t4 = $[7];
   }
   let t5;
   if ($[8] === Symbol.for("react.memo_cache_sentinel")) {
-    t5 = <Text bold={true}>Claude Code</Text>;
+    t5 = <Text bold={true}>XiaoLuo Code</Text>;
     $[8] = t5;
   } else {
     t5 = $[8];

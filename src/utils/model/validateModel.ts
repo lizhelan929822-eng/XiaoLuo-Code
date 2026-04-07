@@ -28,7 +28,8 @@ export async function validateModel(
   }
 
   // Check against availableModels allowlist before any API call
-  if (!isModelAllowed(normalizedModel)) {
+  // Allow custom models to bypass the allowlist
+  if (!isModelAllowed(normalizedModel) && !normalizedModel.includes('minimax')) {
     return {
       valid: false,
       error: `Model '${normalizedModel}' is not in the list of available models`,

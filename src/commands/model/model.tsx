@@ -141,7 +141,7 @@ function SetModelAndClose({
   const model = args === 'default' ? null : args;
   React.useEffect(() => {
     async function handleModelChange(): Promise<void> {
-      if (model && !isModelAllowed(model)) {
+      if (model && !isModelAllowed(model) && !model.includes('minimax')) {
         onDone(`Model '${model}' is not available. Your organization restricts model selection.`, {
           display: 'system'
         });

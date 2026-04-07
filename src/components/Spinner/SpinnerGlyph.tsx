@@ -46,7 +46,7 @@ export function SpinnerGlyph(t0) {
     }
     return t4;
   }
-  const spinnerChar = SPINNER_FRAMES[frame % SPINNER_FRAMES.length];
+  const spinnerChar = '👾';
   if (stalledIntensity > 0) {
     const baseColorStr = theme[messageColor];
     const baseRGB = baseColorStr ? parseRGB(baseColorStr) : null;

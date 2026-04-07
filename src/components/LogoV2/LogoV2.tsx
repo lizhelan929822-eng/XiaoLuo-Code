@@ -248,8 +248,8 @@ export function LogoV2() {
   }
   const layoutMode = getLayoutMode(columns);
   const userTheme = resolveThemeSetting(getGlobalConfig().theme);
-  const borderTitle = ` ${color("claude", userTheme)("Claude Code")} ${color("inactive", userTheme)(`v${version}`)} `;
-  const compactBorderTitle = color("claude", userTheme)(" Claude Code ");
+  const borderTitle = ` ${color("claude", userTheme)("XiaoLuo Code")} `;
+  const compactBorderTitle = color("claude", userTheme)(" XiaoLuo Code ");
   if (layoutMode === "compact") {
     let welcomeMessage = formatWelcomeMessage(username);
     if (stringWidth(welcomeMessage) > columns - 4) {
@@ -279,15 +279,18 @@ export function LogoV2() {
     }
     let t12;
     if ($[34] === Symbol.for("react.memo_cache_sentinel")) {
-      t12 = <Box marginY={1}><Clawd /></Box>;
+      t12 = <Box marginY={1}><Text>╔═════════════════════╗
+║    XiaoLuo Code     ║
+╚═════════════════════╝</Text></Box>;
       $[34] = t12;
     } else {
       t12 = $[34];
     }
     let t13;
-    if ($[35] !== modelDisplayName) {
-      t13 = <Text dimColor={true}>{modelDisplayName}</Text>;
+    if ($[35] !== modelDisplayName || $[50] !== version) {
+      t13 = <Text dimColor={true}>{modelDisplayName} · XiaoLuo Code v{version}</Text>;
       $[35] = modelDisplayName;
+      $[50] = version;
       $[36] = t13;
     } else {
       t13 = $[36];
@@ -369,20 +372,23 @@ export function LogoV2() {
     t18 = $[47];
   }
   let t19;
-  if ($[48] === Symbol.for("react.memo_cache_sentinel")) {
-    t19 = <Clawd />;
-    $[48] = t19;
-  } else {
-    t19 = $[48];
-  }
-  let t20;
-  if ($[49] !== modelLine) {
-    t20 = <Text dimColor={true}>{modelLine}</Text>;
-    $[49] = modelLine;
-    $[50] = t20;
-  } else {
-    t20 = $[50];
-  }
+    if ($[48] === Symbol.for("react.memo_cache_sentinel")) {
+      t19 = <Text>╔═════════════════════╗
+║    XiaoLuo Code     ║
+╚═════════════════════╝</Text>;
+      $[48] = t19;
+    } else {
+      t19 = $[48];
+    }
+    const modelVersionLine = !process.env.IS_DEMO && config.oauthAccount?.organizationName ? `${modelDisplayName} · ${billingType} · ${config.oauthAccount.organizationName} · XiaoLuo Code v${version}` : `${modelDisplayName} · ${billingType} · XiaoLuo Code v${version}`;
+    let t20;
+    if ($[49] !== modelVersionLine) {
+      t20 = <Text dimColor={true}>{modelVersionLine}</Text>;
+      $[49] = modelVersionLine;
+      $[50] = t20;
+    } else {
+      t20 = $[50];
+    }
   let t21;
   if ($[51] !== cwdLine) {
     t21 = <Text dimColor={true}>{cwdLine}</Text>;
