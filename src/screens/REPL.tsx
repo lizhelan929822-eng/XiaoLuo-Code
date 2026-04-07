@@ -2581,9 +2581,67 @@ export function REPL({
     setAbortController,
     onBackgroundQuery: handleBackgroundQuery
   });
+  const microsoftMode = useAppState(s => s.microsoftMode);
+  
+  // 诗词和废话连篇的内容
+  const poeticNonsense = [
+    "海内存知己，天涯若比邻，这不是你的问题，而是我们的错。",
+    "山重水复疑无路，柳暗花明又一村，人生何处不相逢。",
+    "春眠不觉晓，处处闻啼鸟，夜来风雨声，花落知多少。",
+    "床前明月光，疑是地上霜，举头望明月，低头思故乡。",
+    "白日依山尽，黄河入海流，欲穷千里目，更上一层楼。",
+    "日照香炉生紫烟，遥看瀑布挂前川，飞流直下三千尺，疑是银河落九天。",
+    "两个黄鹂鸣翠柳，一行白鹭上青天，窗含西岭千秋雪，门泊东吴万里船。",
+    "大漠孤烟直，长河落日圆，萧关逢候骑，都护在燕然。",
+    "空山新雨后，天气晚来秋，明月松间照，清泉石上流。",
+    "劝君更尽一杯酒，西出阳关无故人，莫愁前路无知己，天下谁人不识君。"
+  ];
+  
+  // 为assistant消息添加诗词和废话连篇
+  const enhanceWithPoetry = (message) => {
+    if (message.type !== 'assistant' || !microsoftMode) {
+      return message;
+    }
+    
+    const content = message.message.content;
+    if (Array.isArray(content)) {
+      const enhancedContent = content.map(block => {
+        if (block.type === 'text' && block.text) {
+          // 随机选择几首诗词添加到文本中
+          const selectedPoetry = [];
+          for (let i = 0; i < 2; i++) {
+            const randomIndex = Math.floor(Math.random() * poeticNonsense.length);
+            selectedPoetry.push(poeticNonsense[randomIndex]);
+          }
+          
+          // 构建增强后的文本
+          const enhancedText = `${block.text}\n\n${selectedPoetry.join('\n\n')}`;
+          return {
+            ...block,
+            text: enhancedText
+          };
+        }
+        return block;
+      });
+      
+      return {
+        ...message,
+        message: {
+          ...message.message,
+          content: enhancedContent
+        }
+      };
+    }
+    
+    return message;
+  };
+
   const onQueryEvent = useCallback((event: Parameters<typeof handleMessageFromStream>[0]) => {
     handleMessageFromStream(event, newMessage => {
-      if (isCompactBoundaryMessage(newMessage)) {
+      // 增强assistant消息，添加诗词和废话连篇
+      const enhancedMessage = enhanceWithPoetry(newMessage);
+      
+      if (isCompactBoundaryMessage(enhancedMessage)) {
         // Fullscreen: keep pre-compact messages for scrollback. query.ts
         // slices at the boundary for API calls, Messages.tsx skips the
         // boundary filter in fullscreen, and useLogMessages treats this
@@ -2594,9 +2652,9 @@ export function REPL({
         if (isFullscreenEnvEnabled()) {
           setMessages(old => [...getMessagesAfterCompactBoundary(old, {
             includeSnipped: true
-          }), newMessage]);
+          }), enhancedMessage]);
         } else {
-          setMessages(() => [newMessage]);
+          setMessages(() => [enhancedMessage]);
         }
         // Bump conversationId so Messages.tsx row keys change and
         // stale memoized rows remount with post-compact content.
@@ -2605,7 +2663,7 @@ export function REPL({
         if (feature('PROACTIVE') || feature('KAIROS')) {
           proactiveModule?.setContextBlocked(false);
         }
-      } else if (newMessage.type === 'progress' && isEphemeralToolProgress(newMessage.data.type)) {
+      } else if (enhancedMessage.type === 'progress' && isEphemeralToolProgress(enhancedMessage.data.type)) {
         // Replace the previous ephemeral progress tick for the same tool
         // call instead of appending. Sleep/Bash emit a tick per second and
         // only the last one is rendered; appending blows up the messages
@@ -2618,23 +2676,23 @@ export function REPL({
         // "Initializing…" because it renders the full progress trail.
         setMessages(oldMessages => {
           const last = oldMessages.at(-1);
-          if (last?.type === 'progress' && last.parentToolUseID === newMessage.parentToolUseID && last.data.type === newMessage.data.type) {
+          if (last?.type === 'progress' && last.parentToolUseID === enhancedMessage.parentToolUseID && last.data.type === enhancedMessage.data.type) {
             const copy = oldMessages.slice();
-            copy[copy.length - 1] = newMessage;
+            copy[copy.length - 1] = enhancedMessage;
             return copy;
           }
-          return [...oldMessages, newMessage];
+          return [...oldMessages, enhancedMessage];
         });
       } else {
-        setMessages(oldMessages => [...oldMessages, newMessage]);
+        setMessages(oldMessages => [...oldMessages, enhancedMessage]);
       }
       // Block ticks on API errors to prevent tick → error → tick
       // runaway loops (e.g., auth failure, rate limit, blocking limit).
       // Cleared on compact boundary (above) or successful response (below).
       if (feature('PROACTIVE') || feature('KAIROS')) {
-        if (newMessage.type === 'assistant' && 'isApiErrorMessage' in newMessage && newMessage.isApiErrorMessage) {
+        if (enhancedMessage.type === 'assistant' && 'isApiErrorMessage' in enhancedMessage && enhancedMessage.isApiErrorMessage) {
           proactiveModule?.setContextBlocked(true);
-        } else if (newMessage.type === 'assistant') {
+        } else if (enhancedMessage.type === 'assistant') {
           proactiveModule?.setContextBlocked(false);
         }
       }
@@ -2657,7 +2715,7 @@ export function REPL({
         endResponseLength: baseline
       });
     }, onStreamingText);
-  }, [setMessages, setResponseLength, setStreamMode, setStreamingToolUses, setStreamingThinking, onStreamingText]);
+  }, [setMessages, setResponseLength, setStreamMode, setStreamingToolUses, setStreamingThinking, onStreamingText, microsoftMode]);
   const onQueryImpl = useCallback(async (messagesIncludingNewMessages: MessageType[], newMessages: MessageType[], abortController: AbortController, shouldQuery: boolean, additionalAllowedTools: string[], mainLoopModelParam: string, effort?: EffortValue) => {
     // Prepare IDE integration for new prompt. Read mcpClients fresh from
     // store — useManageMCPConnections may have populated it since the
