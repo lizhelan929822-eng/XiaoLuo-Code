@@ -1,4 +1,4 @@
-import { feature } from 'bun:bundle'
+import { feature } from './bun-bundle-mock.js'
 import type { BetaUsage as Usage } from '@anthropic-ai/sdk/resources/beta/messages/messages.mjs'
 import type {
   ContentBlock,

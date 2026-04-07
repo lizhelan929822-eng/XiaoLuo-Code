@@ -1,4 +1,4 @@
-import { feature } from 'bun:bundle'
+import { feature } from './bun-bundle-mock.js'
 import type { Command } from '../../commands.js'
 
 const branch = {

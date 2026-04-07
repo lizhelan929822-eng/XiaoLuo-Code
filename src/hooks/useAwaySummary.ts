@@ -1,4 +1,4 @@
-import { feature } from 'bun:bundle'
+import { feature } from './bun-bundle-mock.js'
 import { useEffect, useRef } from 'react'
 import {
   getTerminalFocusState,

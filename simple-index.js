@@ -9,8 +9,8 @@ if (!process.env.XIAOLUO_CONFIG) {
 }
 
 // 检查配置文件是否存在
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
 
 const configPath = path.resolve(process.env.XIAOLUO_CONFIG);
 if (!fs.existsSync(configPath)) {
@@ -39,24 +39,29 @@ if (!config.apiKey) {
 }
 
 // 尝试加载完整功能
-console.log('\n尝试加载完整功能...');
-try {
-  // 尝试加载构建后的主文件
-  const mainModule = require('./dist/main.js');
-  if (mainModule.main) {
-    console.log('完整功能加载成功！');
-    mainModule.main().catch((error) => {
-      console.error('完整功能启动失败:', error);
-      process.exit(1);
-    });
-  } else {
-    console.log('完整功能模块加载成功，但缺少main函数');
+async function loadFullFunctionality() {
+  console.log('\n尝试加载完整功能...');
+  try {
+    // 尝试加载构建后的主文件
+    const mainModule = await import('./dist/main.js');
+    if (mainModule.main) {
+      console.log('完整功能加载成功！');
+      mainModule.main().catch((error) => {
+        console.error('完整功能启动失败:', error);
+        process.exit(1);
+      });
+    } else {
+      console.log('完整功能模块加载成功，但缺少main函数');
+      fallbackToSimplified();
+    }
+  } catch (error) {
+    console.log('完整功能加载失败，使用简化模式:', error.message);
     fallbackToSimplified();
   }
-} catch (error) {
-  console.log('完整功能加载失败，使用简化模式:', error.message);
-  fallbackToSimplified();
 }
+
+// 调用加载函数
+loadFullFunctionality();
 
 // 简化模式
 function fallbackToSimplified() {
